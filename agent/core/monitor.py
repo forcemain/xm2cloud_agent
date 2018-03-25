@@ -124,8 +124,6 @@ class Monitor(Process):
         except GracefulExitException:
             print 'Monitor process({0}) got GracefulExitException.'.format(os.getpid())
         except Exception as e:
-            import traceback
-            print traceback.format_exc()
             print 'Monitor process({0}) got unexpected Exception {1}'.format(os.getpid(), e)
         finally:
             self.run_destructor()
