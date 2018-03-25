@@ -84,7 +84,7 @@ class Mem(object):
             data['mem_memused_percentage'] = self.get_mem_memused_percentage().to_dict()
         if isinstance(self.get_mem_swaptotal(), MetricData):
             data['mem_swaptotal'] = self.get_mem_swaptotal().to_dict()
-        if isinstance(self.mem_swapused(), MetricData):
+        if isinstance(self.get_mem_swapused(), MetricData):
             data['mem_swapused'] = self.get_mem_swapused().to_dict()
         if isinstance(self.get_mem_swapfree(), MetricData):
             data['mem_swapfree'] = self.get_mem_swapfree().to_dict()
