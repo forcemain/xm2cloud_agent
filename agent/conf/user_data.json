@@ -1,0 +1,21 @@
+{
+  "host_id": 1,
+  "cluster_id": [1],
+  "hostgroup_id": [14],
+  "rabbitmq_ssl": false,
+  "rabbitmq_port": 5672,
+  "host_name": "000-CN-ALI-0001",
+  "rabbitmq_vhost": "event_engine",
+  "rabbitmq_host": "ops.xxoo.com",
+  "rabbitmq_exchange_type": "topic",
+  "rabbitmq_up_queue": "event_up_queue",
+  "rabbitmq_down_queue": "event_down_queue",
+  "rabbitmq_auth_user": "event_engine_user",
+  "rabbitmq_routing_key": "event_engine.rpc",
+  "rabbitmq_up_exchange": "event_up_exchange",
+  "rabbitmq_down_exchange": "event_down_exchange",
+  "metric_uuid": "f352c284-19f3-44ef-927e-8ad2eabdae94",
+  "consumer_key": "eG1kZXZvcHNAdmlwLnFxLmNvbQequalequal",
+  "rabbitmq_auth_pass": "oZ38h0GoA0TehWcAPyIJqaponqo8Itv9"
+}
+

@@ -5,57 +5,49 @@ import os
 import time
 
 
+from traceback import format_exc
+
 from agent import settings
-from agent import database
 from threadpool import makeRequests
 from multiprocessing import Process
 from agent.util.logger import Logger
 from datetime import datetime, timedelta
-from agent.handler.cache import CacheHandler
+from agent.metrics.baseloader import BaseLoader
 from agent.handler.monitor import MonitorHandler
 from agent.exceptions import GracefulExitException
 from agent.metrics.basecollect import BaseCollector
+from agent.handler.event import MonitorEventHandler
+from agent.handler.channel.rabbitmq import RabbitMQChannelHandler
 
 
 logger = Logger.get_logger(__name__)
 
 
 class Monitor(Process):
-    def __init__(self, gsignal, cache_path=None, monitor_handler=None, eventer_handler=None):
+    def __init__(self, gsignal, monitor_handler=None, event_handler=None, channel_handler=None):
         super(Monitor, self).__init__()
 
         self._task_map = {}
         self._gsignal = gsignal
-        self._wcache_handler = None
-        self._cache_path = cache_path
+        self._event_handler = event_handler
+        self._channel_handler = channel_handler
         self._monitor_handler = monitor_handler
-        self._eventer_handler = eventer_handler
-
-    @property
-    def cache_path(self):
-        if self._cache_path is not None and os.path.exists(self._cache_path):
-            return self._cache_path
-        basedir = database.get_basedir()
-        self._cache_path = os.path.join(basedir, 'cache', 'monitor')
-
-        return self._cache_path
-
-    @property
-    def wcache_handler(self):
-        if isinstance(self._wcache_handler, CacheHandler):
-            return self._wcache_handler
-        cache_path = self.cache_path
-        self._wcache_handler = CacheHandler(cache_path=cache_path)
-
-        return self._wcache_handler
 
     @property
     def monitor_handler(self):
-        if self._monitor_handler:
+        if isinstance(self._monitor_handler, MonitorHandler):
             return self._monitor_handler
         self._monitor_handler = MonitorHandler()
 
         return self._monitor_handler
+
+    @property
+    def channel_handler(self):
+        if isinstance(self._channel_handler, RabbitMQChannelHandler):
+            return self._channel_handler
+        self._channel_handler = RabbitMQChannelHandler()
+
+        return self._channel_handler
 
     @property
     def next_scheduled(self):
@@ -65,14 +57,18 @@ class Monitor(Process):
         return next_time_str
 
     @property
-    def eventer_handler(self):
-        return self._eventer_handler
+    def event_handler(self):
+        if isinstance(self._event_handler, MonitorEventHandler):
+            return self._event_handler
+        self._event_handler = MonitorEventHandler()
+
+        return self._event_handler
 
     def event_get(self):
         events = []
 
         for klass in BaseCollector():
-            if klass.loader is None:
+            if not isinstance(klass.loader, BaseLoader):
                 args = ()
                 kwargs = {}
             else:
@@ -85,16 +81,16 @@ class Monitor(Process):
         return events
 
     def event_put(self, task, res):
-        """
-        Todo:
-        1. creat event and put it to local cache
-        """
-        task_data = self._task_map.pop(task.requestID)
-
-        event = task_data.get('event')
+        self._task_map.pop(task.requestID)
 
         for ins in res:
-            print ins
+            if not ins.is_valid():
+                logger.warning('Invalid monitor event data: {0}'.format(ins))
+                continue
+            logger.debug('Verified monitor event data: {0}'.format(ins))
+            event = self.event_handler.create_event(ins.to_json())
+
+            self.channel_handler.wcache_handler.write(event.to_json())
 
     def run_destructor(self):
         pass
@@ -104,7 +100,7 @@ class Monitor(Process):
         task_data = self._task_map.pop(task.requestID)
 
         event = task_data.get('event')
-        logger.error('Call plugin {0} {1}'.format(event.__module__, exception))
+        logger.error('Call plugin {0} {1}'.format(event.real_name, exception))
 
     def run(self):
         try:
@@ -113,20 +109,19 @@ class Monitor(Process):
                 if len(events) == 0:
                     logger.info('No events ready, next scheduled at {0}'.format(self.next_scheduled))
                     time.sleep(settings.MONITOR_SCHEDULER_INTERVAL)
+                    continue
                 tasks = makeRequests(self.monitor_handler.run_executer, events, self.event_put, self.event_exp)
                 for i, task in enumerate(tasks):
-                    self._task_map.update({task.requestID: {
-                        'event': events[i]
-                    }})
+                    self._task_map.update({task.requestID: {'event': events[i]}})
                 self.monitor_handler.feed(*tasks)
                 time.sleep(settings.MONITOR_SCHEDULER_INTERVAL)
             print 'Monitor process({0}) exit.'.format(os.getpid())
         except GracefulExitException:
             print 'Monitor process({0}) got GracefulExitException.'.format(os.getpid())
         except Exception as e:
+            print '=' * 100
+            print format_exc()
+            print '=' * 100
             print 'Monitor process({0}) got unexpected Exception {1}'.format(os.getpid(), e)
         finally:
             self.run_destructor()
-
-
-

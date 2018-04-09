@@ -3,6 +3,7 @@
 
 import re
 import os
+import uuid
 import shutil
 import hashlib
 import chardet
@@ -140,3 +141,9 @@ class Switch(object):
             return True
 
         return self._v in args
+
+
+class Random(object):
+    @staticmethod
+    def get_uuid():
+        return uuid.uuid4().__str__()

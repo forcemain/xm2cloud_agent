@@ -1,8 +1,6 @@
 #! -*- coding: utf-8 -*-
 
 
-import os
-import json
 import time
 import psutil
 import operator
@@ -10,11 +8,12 @@ import operator
 
 from functools import partial
 from agent.util.enhance import Switch
+from agent.metrics.basemetric import BaseMetric
 from agent.metrics.metric_data import MetricData
 from agent.metrics.basecollect import BaseCollector
 
 
-class Net(object):
+class Net(BaseMetric):
     def __init__(self, net_if_in_bytes_persec=None, net_if_out_bytes_persec=None,
                  net_if_in_packets_persec=None, net_if_out_packets_error=None):
         self.net_if_in_bytes_persec = net_if_in_bytes_persec
@@ -59,16 +58,8 @@ class Net(object):
 
         return data
 
-    def to_json(self, indent=4):
-        dict_data = self.to_dict()
-        json_data = json.dumps(dict_data, indent=indent)
-
-        return json_data
-
-    def __str__(self):
-        desc = '<{0}: {1}{2}>'.format(__name__, os.linesep, self.to_json(indent=4))
-
-        return desc
+    def is_valid(self):
+        return True
 
 
 class Collector(BaseCollector):

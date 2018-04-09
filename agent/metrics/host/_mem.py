@@ -1,18 +1,17 @@
 #! -*- coding: utf-8 -*-
 
 
-import os
-import json
 import psutil
 
 
 from functools import partial
 from agent.util.enhance import Switch
+from agent.metrics.basemetric import BaseMetric
 from agent.metrics.metric_data import MetricData
 from agent.metrics.basecollect import BaseCollector
 
 
-class Mem(object):
+class Mem(BaseMetric):
     def __init__(self, mem_memtotal=None, mem_memused=None, mem_memfree=None, mem_memused_percentage=None,
                  mem_swaptotal=None, mem_swapused=None, mem_swapfree=None, mem_swapused_percentage=None):
         self.mem_memtotal = mem_memtotal
@@ -93,16 +92,8 @@ class Mem(object):
 
         return data
 
-    def to_json(self, indent=4):
-        dict_data = self.to_dict()
-        json_data = json.dumps(dict_data, indent=indent)
-
-        return json_data
-
-    def __str__(self):
-        desc = '<{0}: {1}{2}>'.format(__name__, os.linesep, self.to_json(indent=4))
-
-        return desc
+    def is_valid(self):
+        return True
 
 
 class Collector(BaseCollector):

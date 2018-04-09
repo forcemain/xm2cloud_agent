@@ -7,12 +7,6 @@ import multiprocessing
 from concurrent import futures
 from agent.metrics import host
 from agent.metrics import user
-# automatic reload metric class
-"""
-example:
-    host.autodiscover()
-    user.autodiscover()
-"""
 from threadpool import ThreadPool
 from agent.util.logger import Logger
 

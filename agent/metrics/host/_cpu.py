@@ -1,18 +1,17 @@
 #! -*- coding: utf-8 -*-
 
 
-import os
-import json
 import linux_metrics
 
 
 from functools import partial
 from agent.util.enhance import Switch
+from agent.metrics.basemetric import BaseMetric
 from agent.metrics.metric_data import MetricData
 from agent.metrics.basecollect import BaseCollector
 
 
-class Cpu(object):
+class Cpu(BaseMetric):
     def __init__(self, cpu_idle=None, cpu_user=None, cpu_iowait=None, cpu_system=None):
         self.cpu_idle = cpu_idle
         self.cpu_user = cpu_user
@@ -56,16 +55,8 @@ class Cpu(object):
 
         return data
 
-    def to_json(self, indent=4):
-        dict_data = self.to_dict()
-        json_data = json.dumps(dict_data, indent=indent)
-
-        return json_data
-
-    def __str__(self):
-        desc = '<{0}: {1}{2}>'.format(__name__, os.linesep, self.to_json(indent=4))
-
-        return desc
+    def is_valid(self):
+        return True
 
 
 class Collector(BaseCollector):

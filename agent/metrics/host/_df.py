@@ -2,17 +2,17 @@
 
 
 import os
-import json
 import psutil
 
 
 from functools import partial
 from agent.util.enhance import Switch
+from agent.metrics.basemetric import BaseMetric
 from agent.metrics.metric_data import MetricData
 from agent.metrics.basecollect import BaseCollector
 
 
-class Df(object):
+class Df(BaseMetric):
     def __init__(self, df_bytes_total=None, df_bytes_used=None, df_bytes_free=None, df_bytes_used_percentage=None):
         self.df_bytes_total = df_bytes_total
         self.df_bytes_used = df_bytes_used
@@ -56,16 +56,8 @@ class Df(object):
 
         return data
 
-    def to_json(self, indent=4):
-        dict_data = self.to_dict()
-        json_data = json.dumps(dict_data, indent=indent)
-
-        return json_data
-
-    def __str__(self):
-        desc = '<{0}: {1}{2}>'.format(__name__, os.linesep, self.to_json(indent=4))
-
-        return desc
+    def is_valid(self):
+        return True
 
 
 class Collector(BaseCollector):

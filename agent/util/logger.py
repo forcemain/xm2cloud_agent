@@ -4,11 +4,11 @@
 import logging
 
 
-# debug mode
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(pathname)s - %(lineno)d - %(levelname)s - %(message)s'
-)
+from agent import settings
+
+
+if settings.DEBUG:
+    logging.basicConfig(level=settings.DEFAULT_LOG_LEVEL, format=settings.DEFAULT_LOG_FORMAT)
 
 
 class Logger(object):
