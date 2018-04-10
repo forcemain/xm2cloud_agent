@@ -16,6 +16,9 @@ from agent.handler.event.engine import EngineEventHandler
 from agent.handler.channel.rabbitmq import RabbitMQChannelHandler
 
 
+_evnet_threads = []
+
+
 logger = Logger.get_logger(__name__)
 
 
@@ -26,6 +29,11 @@ class EventThread(Thread):
         self._obj = obj
         self._fname, self._fcontent = event_data
 
+    def run_destructor(self):
+        if self in _evnet_threads:
+            _evnet_threads.remove(self)
+        self._obj.channel_handler.rcache_handler.remove(self._fname)
+
     def run(self):
         try:
             event = PubEvent.from_json(self._fcontent)
@@ -33,7 +41,7 @@ class EventThread(Thread):
         except Exception as e:
             logger.error('Handler %s got unexpected Exception %s', self._fname, e)
         finally:
-            self._obj.channel_handler.rcache_handler.remove(self._fname)
+            self.run_destructor()
 
 
 class Engine(Process):
@@ -90,24 +98,28 @@ class Engine(Process):
         #       3.2. is expired ? ( half hour ago. )
         #       3.3. is choreography ? ( handler later. )
         #
-        pass
+        print event
 
     def run(self):
         try:
             while not self._gsignal.is_set():
+                need_wait = False
                 events_data = self.event_get()
                 if len(events_data) == 0:
-                    logger.info('No events ready, next scheduled at {0}'.format(self.next_scheduled))
+                    need_wait = True
+                    logger.info('No events ready, next scheduled at %s', self.next_scheduled)
+                if len(_evnet_threads) > settings.ENGINE_MAX_THREADPOOL_SIZE:
+                    need_wait = True
+                    logger.info('To many threads, next scheduled at %s', self.next_scheduled)
+                if need_wait is True:
                     time.sleep(settings.ENGINE_SCHEDULER_INTERVAL)
                     continue
-                events_task = []
                 for event_data in events_data:
                     t = EventThread(event_data, self)
                     t.setDaemon(True)
                     t.start()
-                    events_task.append(t)
-                for event_task in events_task:
-                    event_task.join()
+                    _evnet_threads.append(t)
+                    # may be an  time-consuming task, so not join
                 time.sleep(settings.ENGINE_SCHEDULER_INTERVAL)
             print 'Engine process({0}) exit.'.format(os.getpid())
         except GracefulExitException:

@@ -4,12 +4,16 @@
 import logging
 
 
+from multiprocessing import cpu_count
+
+
 # Debug Settings
 DEBUG = True
 
 
 # Engine Settings
 ENGINE_SCHEDULER_INTERVAL = 3
+ENGINE_MAX_THREADPOOL_SIZE = cpu_count()*4
 
 # Monitor Settings
 MONITOR_SCHEDULER_INTERVAL = 15
