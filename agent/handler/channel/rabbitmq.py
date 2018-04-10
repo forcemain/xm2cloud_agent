@@ -5,6 +5,7 @@ import pika
 import time
 
 
+from agent import settings
 from agent.util.logger import Logger
 from agent.util.amqp.sender import AMQPSender
 from agent.util.amqp.receiver import AMQPReceiver
@@ -32,7 +33,8 @@ class RabbitMQChannelSender(BaseChannelHelper, AMQPSender):
         # may be you want filter out event that half an hour ago
         for event_data in events:
             fname, fcontent = event_data
-            if time.time() - self.wcache_handler.mtime(fname) < 1800:
+            mtimedelta = time.time() - self.wcache_handler.mtime(fname)
+            if mtimedelta < settings.CHANNEL_SENDER_EVENT_EXPIRED_TIME:
                 events_data.append(event_data)
                 continue
             logger.warning('Expired event file %s, deleted', fname)

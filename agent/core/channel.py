@@ -5,9 +5,6 @@ import os
 import time
 
 
-from traceback import format_exc
-
-
 from agent import settings
 from threading import Thread
 from functools import partial
@@ -47,9 +44,6 @@ class Channel(Process):
         try:
             func()
         except Exception as e:
-            print '=' * 100
-            print format_exc()
-            print '=' * 100
             logger.error('%s got unexpected Exception %s', name, e)
 
     def sender_thread(self):
@@ -76,7 +70,7 @@ class Channel(Process):
         sender_disconnect_time = self.channel_handler.msg_sender.disconnect_time
         if sender_disconnect_time is not None:
             logger.debug('Channel sender disconnect time, %f', sender_disconnect_time)
-            if time.time() - sender_disconnect_time > 60:
+            if time.time() - sender_disconnect_time > settings.CHANNEL_SENDER_DISCONNECT_TIME:
                 try:
                     self.channel_handler.msg_sender.stop()
                 except Exception as e:
@@ -87,7 +81,7 @@ class Channel(Process):
         receiver_disconnect_time = self.channel_handler.msg_receiver.disconnect_time
         if receiver_disconnect_time is not None:
             logger.debug('Channel sender disconnect time, %f', sender_disconnect_time)
-            if time.time() - receiver_disconnect_time > 60:
+            if time.time() - receiver_disconnect_time > settings.CHANNEL_RECEIVER_DISCONNECT_TIME:
                 try:
                     self.channel_handler.msg_receiver.stop()
                 except Exception as e:
