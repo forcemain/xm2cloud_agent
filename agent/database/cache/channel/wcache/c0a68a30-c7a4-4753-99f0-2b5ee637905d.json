@@ -1,0 +1,26 @@
+{
+    "handled_event_host_id": null, 
+    "event_source": "xm2cloud_agent", 
+    "target_hostgroup_id": null, 
+    "source_cluster_id": [
+        1
+    ], 
+    "event_id": null, 
+    "metric_uuid": "f352c284-19f3-44ef-927e-8ad2eabdae94", 
+    "target_host_id": null, 
+    "source_host_id": 1, 
+    "target_cluster_id": null, 
+    "event_name": "monitoring", 
+    "enc_method": null, 
+    "chain_event_id": null, 
+    "event_timestamp": 1523327704, 
+    "source_version": "0.0.1", 
+    "handled_event_cluster_id": null, 
+    "handled_event_hostgroup_id": null, 
+    "event_uuid": "08c0958b-41fe-4acb-ba87-7b66749e686a", 
+    "event_data": "{\n    \"mem_swapused_percentage\": {\n        \"name\": \"mem.swapused.percentage\", \n        \"value\": 53.9\n    }, \n    \"mem_swapused\": {\n        \"name\": \"mem.swapused\", \n        \"value\": 1157103616\n    }, \n    \"mem_memtotal\": {\n        \"name\": \"mem.memtotal\", \n        \"value\": 8589934592\n    }, \n    \"mem_swaptotal\": {\n        \"name\": \"mem.swaptotal\", \n        \"value\": 2147483648\n    }, \n    \"mem_memfree\": {\n        \"name\": \"mem.memfree\", \n        \"value\": 18481152\n    }, \n    \"mem_swapfree\": {\n        \"name\": \"mem.swapfree\", \n        \"value\": 990380032\n    }, \n    \"mem_memused\": {\n        \"name\": \"mem.memused\", \n        \"value\": 7572226048\n    }, \n    \"mem_memused_percentage\": {\n        \"name\": \"mem.memused.percentage\", \n        \"value\": 68.7\n    }\n}", 
+    "source_hostgroup_id": [
+        14
+    ], 
+    "handled_event_id": null
+}

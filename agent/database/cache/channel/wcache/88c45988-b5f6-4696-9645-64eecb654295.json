@@ -1,0 +1,26 @@
+{
+    "handled_event_host_id": null, 
+    "event_source": "xm2cloud_agent", 
+    "target_hostgroup_id": null, 
+    "source_cluster_id": [
+        1
+    ], 
+    "event_id": null, 
+    "metric_uuid": "f352c284-19f3-44ef-927e-8ad2eabdae94", 
+    "target_host_id": null, 
+    "source_host_id": 1, 
+    "target_cluster_id": null, 
+    "event_name": "monitoring", 
+    "enc_method": null, 
+    "chain_event_id": null, 
+    "event_timestamp": 1523327704, 
+    "source_version": "0.0.1", 
+    "handled_event_cluster_id": null, 
+    "handled_event_hostgroup_id": null, 
+    "event_uuid": "26082cd3-4460-4777-a2c5-8a196148f2d4", 
+    "event_data": "{\n    \"df_bytes_used_percentage\": {\n        \"name\": \"df.bytes.used.percentage/device=disk1s1,mount=/\", \n        \"value\": 23.4\n    }, \n    \"df_bytes_free\": {\n        \"name\": \"df.bytes.free/device=disk1s1,mount=/\", \n        \"value\": 189118287872\n    }, \n    \"df_bytes_total\": {\n        \"name\": \"df.bytes.used/device=disk1s1,mount=/\", \n        \"value\": 57667452928\n    }\n}", 
+    "source_hostgroup_id": [
+        14
+    ], 
+    "handled_event_id": null
+}
