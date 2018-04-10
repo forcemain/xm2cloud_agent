@@ -8,6 +8,9 @@ import logging
 DEBUG = True
 
 
+# Engine Settings
+ENGINE_SCHEDULER_INTERVAL = 3
+
 # Monitor Settings
 MONITOR_SCHEDULER_INTERVAL = 15
 

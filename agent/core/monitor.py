@@ -14,7 +14,7 @@ from agent.metrics.baseloader import BaseLoader
 from agent.handler.monitor import MonitorHandler
 from agent.exceptions import GracefulExitException
 from agent.metrics.basecollect import BaseCollector
-from agent.handler.event import MonitorEventHandler
+from agent.handler.event.monitor import MonitorEventHandler
 from agent.handler.channel.rabbitmq import RabbitMQChannelHandler
 
 

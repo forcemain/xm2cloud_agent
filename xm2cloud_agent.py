@@ -5,6 +5,7 @@ import sys
 
 
 from agent.util.logger import Logger
+from agent.core.engine import Engine
 from agent.core.monitor import Monitor
 from agent.core.channel import Channel
 from agent.database import get_agentdir
@@ -20,17 +21,21 @@ logger = Logger.get_logger(__name__)
 
 
 class Agent(object):
-    def __init__(self, channel=None, event=None, heatbeat=None, monitor=None):
-        self._event = event
+    def __init__(self, channel=None, engine=None, heatbeat=None, monitor=None):
+        self._engine = engine
+        self._monitor = monitor
         self._channel = channel
         self._heatbeat = heatbeat
-        self._monitor = monitor
 
         self._gsignal = GracefulExitSignal()
 
     @property
-    def event(self):
-        return self._event
+    def engine(self):
+        if isinstance(self._engine, Engine):
+            return self._engine
+        self._engine = Engine(self._gsignal)
+
+        return self.engine
 
     @property
     def channel(self):
@@ -42,7 +47,7 @@ class Agent(object):
 
     @property
     def heatbeat(self):
-        return self._event
+        return self._heatbeat
 
     @property
     def monitor(self):
@@ -53,12 +58,14 @@ class Agent(object):
         return self._monitor
 
     def run(self):
+        self.engine.start()
         self.monitor.start()
         self.channel.start()
 
     def start(self):
         self.run()
         self._gsignal.register_workers(*[
+            self.engine,
             self.monitor,
             self.channel
         ])
