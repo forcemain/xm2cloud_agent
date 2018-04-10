@@ -5,8 +5,6 @@ import os
 import time
 
 
-from traceback import format_exc
-
 from agent import settings
 from threadpool import makeRequests
 from multiprocessing import Process
@@ -119,9 +117,6 @@ class Monitor(Process):
         except GracefulExitException:
             print 'Monitor process({0}) got GracefulExitException.'.format(os.getpid())
         except Exception as e:
-            print '=' * 100
-            print format_exc()
-            print '=' * 100
             print 'Monitor process({0}) got unexpected Exception {1}'.format(os.getpid(), e)
         finally:
             self.run_destructor()

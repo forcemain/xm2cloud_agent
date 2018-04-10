@@ -5,7 +5,7 @@
   "rabbitmq_ssl": false,
   "rabbitmq_port": 5672,
   "host_name": "000-CN-ALI-0001",
-  "rabbitmq_vhost": "event_engine",
+  "rabbitmq_vhost": "/event_engine",
   "rabbitmq_host": "ops.xxoo.com",
   "rabbitmq_exchange_type": "topic",
   "rabbitmq_up_queue": "event_up_queue",

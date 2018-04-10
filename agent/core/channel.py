@@ -5,6 +5,9 @@ import os
 import time
 
 
+from traceback import format_exc
+
+
 from agent import settings
 from threading import Thread
 from functools import partial
@@ -44,13 +47,16 @@ class Channel(Process):
         try:
             func()
         except Exception as e:
+            print '=' * 100
+            print format_exc()
+            print '=' * 100
             logger.error('%s got unexpected Exception %s', name, e)
 
     def sender_thread(self):
         target = partial(self.thread_exp, 'Channel sender', self.channel_handler.msg_sender.run)
         t = Thread(target=target)
-
         t.setDaemon(True)
+        
         return t
 
     def receiver_thread(self):

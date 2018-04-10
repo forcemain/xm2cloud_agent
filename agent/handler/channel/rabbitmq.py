@@ -76,7 +76,7 @@ class RabbitMQChannelSender(BaseChannelHelper, AMQPSender):
             # fpath = os.path.join(self.wcache_handler.cache_path, fname)
             self._channel.basic_publish(self._exchange, self._routing_key, fcontent, properties={})
             self._message_number += 1
-            self._cache_confirm.update({self._message_number, fname})
+            self._cache_confirm.update({self._message_number: fname})
             self._deliveries.append(self._message_number)
             logger.info('Published message # %i', self._message_number)
         self.schedule_next_message()
