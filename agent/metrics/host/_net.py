@@ -64,27 +64,28 @@ class Net(BaseMetric):
 
 class Collector(BaseCollector):
     def get_metricdata(self, net_iface, net_count, name):
+        tags = {'iface': net_iface}
         for case in Switch(name):
             if case('net_if_in_bytes_persec'):
-                name = 'net.if.in.bytes.persec/iface={0}'.format(net_iface)
+                name = 'net.if.in.bytes.persec'
                 value = net_count[0]
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('net_if_out_bytes_persec'):
-                name = 'net.if.out.bytes.persec/iface={0}'.format(net_iface)
+                name = 'net.if.out.bytes.persec'
                 value = net_count[1]
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('net_if_in_packets_persec'):
-                name = 'net.if.in.packets.persec/iface={0}'.format(net_iface)
+                name = 'net.if.in.packets.persec'
                 value = net_count[2]
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('net_if_out_packets_error'):
                 name = 'net.if.out.packets.error/iface={0}'.format(net_iface)
                 value = net_count[3]
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case():
                 return None
 

@@ -63,27 +63,28 @@ class Df(BaseMetric):
 class Collector(BaseCollector):
     def get_metricdata(self, disk, disk_usage, name):
         ddev = os.path.basename(disk.device)
+        tags = {'device': ddev, 'mount': disk.mountpoint}
         for case in Switch(name):
             if case('df_bytes_total'):
-                name = 'df.bytes.total/device={0},mount={1}'.format(ddev, disk.mountpoint)
+                name = 'df.bytes.total'
                 value = disk_usage.total
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('df_bytes_used'):
-                name = 'df.bytes.used/device={0},mount={1}'.format(ddev, disk.mountpoint)
+                name = 'df.bytes.used'
                 value = disk_usage.used
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('df_bytes_free'):
-                name = 'df.bytes.free/device={0},mount={1}'.format(ddev, disk.mountpoint)
+                name = 'df.bytes.free'
                 value = disk_usage.free
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('df_bytes_used_percentage'):
-                name = 'df.bytes.used.percentage/device={0},mount={1}'.format(ddev, disk.mountpoint)
+                name = 'df.bytes.used.percentage'
                 value = disk_usage.percent
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case():
                 return None
 

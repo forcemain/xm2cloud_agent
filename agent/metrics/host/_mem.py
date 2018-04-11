@@ -98,47 +98,48 @@ class Mem(BaseMetric):
 
 class Collector(BaseCollector):
     def get_metricdata(self, mem_mem, mem_swap, name):
+        tags = {}
         for case in Switch(name):
             if case('mem_memtotal'):
                 name = 'mem.memtotal'
                 value = mem_mem.total
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('mem_memused'):
                 name = 'mem.memused'
                 value = mem_mem.used
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('mem_memfree'):
                 name = 'mem.memfree'
                 value = mem_mem.free
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('mem_memused_percentage'):
                 name = 'mem.memused.percentage'
                 value = mem_mem.percent
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('mem_swaptotal'):
                 name = 'mem.swaptotal'
                 value = mem_swap.total
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('mem_swapused'):
                 name = 'mem.swapused'
                 value = mem_swap.used
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('mem_swapfree'):
                 name = 'mem.swapfree'
                 value = mem_swap.free
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('mem_swapused_percentage'):
                 name = 'mem.swapused.percentage'
                 value = mem_swap.percent
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case():
                 return None
 

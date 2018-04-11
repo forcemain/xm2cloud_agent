@@ -61,27 +61,28 @@ class Cpu(BaseMetric):
 
 class Collector(BaseCollector):
     def get_metricdata(self, cpu_usage, name):
+        tags = {}
         for case in Switch(name):
             if case('cpu_idle'):
                 name = 'cpu.idle'
                 value = cpu_usage.get('idle')
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('cpu_user'):
                 name = 'cpu.user'
                 value = cpu_usage.get('user')
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('cpu_iowait'):
                 name = 'cpu.iowait'
                 value = cpu_usage.get('iowait')
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('cpu_system'):
                 name = 'cpu.system'
                 value = cpu_usage.get('system')
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case():
                 return None
 

@@ -52,22 +52,23 @@ class Load(BaseMetric):
 
 class Collector(BaseCollector):
     def get_metricdata(self, load_usage, name):
+        tags = {}
         for case in Switch(name):
             if case('load_1min'):
                 name = 'load.1min'
                 value = load_usage[0]
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('load_5min'):
                 name = 'load.5min'
                 value = load_usage[1]
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case('load_15min'):
                 name = 'load.15min'
                 value = load_usage[2]
 
-                return MetricData(name, value)
+                return MetricData(name, tags, value)
             if case():
                 return None
 
