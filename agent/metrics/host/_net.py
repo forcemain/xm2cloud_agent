@@ -82,7 +82,7 @@ class Collector(BaseCollector):
 
                 return MetricData(name, tags, value)
             if case('net_if_out_packets_error'):
-                name = 'net.if.out.packets.error/iface={0}'.format(net_iface)
+                name = 'net.if.out.packets.error'
                 value = net_count[3]
 
                 return MetricData(name, tags, value)
