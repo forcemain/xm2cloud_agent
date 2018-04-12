@@ -1,3 +1,6 @@
+### For Arch:
+![xm2cloud.png](https://raw.githubusercontent.com/xm2cloud/xm2cloud_agent/master/docs/screenshot/design/xm2cloud.png)
+
 ### For Debug:
 
 
