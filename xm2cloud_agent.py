@@ -9,6 +9,7 @@ from agent.core.engine import Engine
 from agent.core.monitor import Monitor
 from agent.core.channel import Channel
 from agent.database import get_agentdir
+from agent.core.heatbeat import Heartbeat
 from agent.signals.exit import GracefulExitSignal
 
 
@@ -47,6 +48,10 @@ class Agent(object):
 
     @property
     def heatbeat(self):
+        if isinstance(self._heatbeat, Heartbeat):
+            return self._heatbeat
+        self._heatbeat = Heartbeat(self._gsignal)
+
         return self._heatbeat
 
     @property
@@ -61,13 +66,15 @@ class Agent(object):
         self.engine.start()
         self.monitor.start()
         self.channel.start()
+        self.heatbeat.start()
 
     def start(self):
         self.run()
         self._gsignal.register_workers(*[
             self.engine,
             self.monitor,
-            self.channel
+            self.channel,
+            self.heatbeat,
         ])
 
     def listening(self):

@@ -15,8 +15,13 @@ DEBUG = True
 ENGINE_SCHEDULER_INTERVAL = 3
 ENGINE_MAX_THREADPOOL_SIZE = cpu_count()*4
 
+
 # Monitor Settings
 MONITOR_SCHEDULER_INTERVAL = 15
+
+
+# Heartbeat Settings
+HEARTBEAT_SCHEDULER_INTERVAL = 3
 
 
 # Channel Settings
@@ -34,5 +39,3 @@ DEFAULT_USERDATA_PATH = '/etc/xm2cloud_agent/user_data.json'
 # Logging Settings
 DEFAULT_LOG_LEVEL = logging.DEBUG
 DEFAULT_LOG_FORMAT = '%(asctime)s - %(name)s - %(pathname)s - %(lineno)d - %(levelname)s - %(message)s'
-
-
