@@ -10,6 +10,7 @@ from threading import Thread
 from functools import partial
 from multiprocessing import Process
 from agent.util.logger import Logger
+from datetime import datetime, timedelta
 from agent.util.amqp.status import AMQPStatus
 from agent.exceptions import GracefulExitException
 from agent.handler.channel.rabbitmq import RabbitMQChannelHandler
@@ -60,6 +61,13 @@ class Channel(Process):
 
         return t
 
+    @property
+    def next_scheduled(self):
+        next_time = datetime.now() + timedelta(seconds=settings.ENGINE_SCHEDULER_INTERVAL)
+        next_time_str = next_time.strftime('%Y-%m-%d %H:%M:%S')
+
+        return next_time_str
+
     def channel_checking(self):
         if self.channel_handler.msg_sender.connection_status == AMQPStatus.DISCONNECTED:
             logger.warning('Channel sender status, %s', AMQPStatus.DISCONNECTED)
@@ -96,6 +104,7 @@ class Channel(Process):
         try:
             while not self._gsignal.is_set():
                 self.channel_checking()
+                logger.info('Events ready, next scheduled at %s', self.next_scheduled)
                 time.sleep(settings.CHANNEL_SCHEDULER_INTERVAL)
             print 'Channel process({0}) exit.'.format(os.getpid())
         except GracefulExitException:

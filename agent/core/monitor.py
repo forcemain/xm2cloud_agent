@@ -112,6 +112,7 @@ class Monitor(Process):
                 for i, task in enumerate(tasks):
                     self._task_map.update({task.requestID: {'event': events[i]}})
                 self.monitor_handler.feed(*tasks)
+                logger.info('Events ready, next scheduled at %s', self.next_scheduled)
                 time.sleep(settings.MONITOR_SCHEDULER_INTERVAL)
             print 'Monitor process({0}) exit.'.format(os.getpid())
         except GracefulExitException:

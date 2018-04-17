@@ -120,6 +120,7 @@ class Engine(Process):
                     t.start()
                     _evnet_threads.append(t)
                     # may be an  time-consuming task, so not join
+                logger.info('Events ready, next scheduled at %s', self.next_scheduled)
                 time.sleep(settings.ENGINE_SCHEDULER_INTERVAL)
             print 'Engine process({0}) exit.'.format(os.getpid())
         except GracefulExitException:

@@ -52,7 +52,7 @@ class Heartbeat(Process):
 
     @property
     def next_scheduled(self):
-        next_time = datetime.now() + timedelta(seconds=settings.MONITOR_SCHEDULER_INTERVAL)
+        next_time = datetime.now() + timedelta(seconds=settings.HEARTBEAT_SCHEDULER_INTERVAL)
         next_time_str = next_time.strftime('%Y-%m-%d %H:%M:%S')
 
         return next_time_str
@@ -62,7 +62,7 @@ class Heartbeat(Process):
 
     def event_put(self, ins):
         if not ins.is_valid():
-            logger.warning('Invalid monitor event data: {0}'.format(ins))
+            logger.warning('Invalid heartbeat event data: {0}'.format(ins))
             return
         logger.debug('Verified monitor event data: {0}'.format(ins))
         event = self.event_handler.create_event(ins.to_json())
@@ -72,9 +72,8 @@ class Heartbeat(Process):
     def run(self):
         try:
             while not self._gsignal.is_set():
-                ins = self.heartbeat_handler.run_executer()
-                self.event_put(ins)
-                logger.info('events ready, next scheduled at {0}'.format(self.next_scheduled))
+                self.event_put(self.heartbeat_handler.run_executer())
+                logger.info('Events ready, next scheduled at %s', self.next_scheduled)
                 time.sleep(settings.HEARTBEAT_SCHEDULER_INTERVAL)
             print 'Heartbeat process({0}) exit.'.format(os.getpid())
         except GracefulExitException:
