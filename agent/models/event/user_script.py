@@ -8,7 +8,7 @@ from agent.models import BaseModel
 
 
 class UserScript(BaseModel):
-    def __init__(self, interpreter='bash', scripttext='', parameters='', timeout=10):
+    def __init__(self, interpreter='bash', scripttext='', parameters='', timeout=300):
         self.timeout = timeout
         self.interpreter = interpreter
         self.scripttext = scripttext
