@@ -43,8 +43,8 @@
 2018-04-20 17:14:40,267 - agent.core.channel - /Users/manmanli/xm-gits/xm2cloud_agent/agent/core/channel.py - 107 - INFO - Events ready, next scheduled at 2018-04-20 17:14:43
 2018-04-20 17:14:40,272 - agent.core.monitor - /Users/manmanli/xm-gits/xm2cloud_agent/agent/core/monitor.py - 101 - ERROR - Call plugin agent.metrics.host._load.Collector [Errno 2] No such file or directory: '/proc/loadavg'
 2018-04-20 17:14:40,275 - agent.core.monitor - /Users/manmanli/xm-gits/xm2cloud_agent/agent/core/monitor.py - 101 - ERROR - Call plugin agent.metrics.host._cpu.Collector [Errno 2] No such file or directory: '/proc/stat'
-2018-04-20 17:14:40,305 - pika.adapters.base_connection - /Library/Python/2.7/site-packages/pika/adapters/base_connection.py - 217 - INFO - Connecting to 120.131.14.225:5672
-2018-04-20 17:14:40,305 - pika.adapters.base_connection - /Library/Python/2.7/site-packages/pika/adapters/base_connection.py - 217 - INFO - Connecting to 120.131.14.225:5672
+2018-04-20 17:14:40,305 - pika.adapters.base_connection - /Library/Python/2.7/site-packages/pika/adapters/base_connection.py - 217 - INFO - Connecting to 000.000.000.000:5672
+2018-04-20 17:14:40,305 - pika.adapters.base_connection - /Library/Python/2.7/site-packages/pika/adapters/base_connection.py - 217 - INFO - Connecting to 000.000.000.000:5672
 2018-04-20 17:14:40,584 - agent.util.amqp.receiver - /Users/manmanli/xm-gits/xm2cloud_agent/agent/util/amqp/receiver.py - 42 - INFO - Connection opened
 2018-04-20 17:14:40,584 - agent.util.amqp.receiver - /Users/manmanli/xm-gits/xm2cloud_agent/agent/util/amqp/receiver.py - 52 - INFO - Adding connection close callback
 2018-04-20 17:14:40,585 - agent.util.amqp.receiver - /Users/manmanli/xm-gits/xm2cloud_agent/agent/util/amqp/receiver.py - 76 - INFO - Creating a new channel
@@ -633,10 +633,10 @@
 Channel process(83147) got GracefulExitException.
 2018-04-20 17:16:00,692 - agent.util.amqp.sender - /Users/manmanli/xm-gits/xm2cloud_agent/agent/util/amqp/sender.py - 183 - INFO - Stopping
 2018-04-20 17:16:00,692 - agent.util.amqp.sender - /Users/manmanli/xm-gits/xm2cloud_agent/agent/util/amqp/sender.py - 174 - INFO - Closing the channel
-2018-04-20 17:16:00,693 - pika.channel - /Library/Python/2.7/site-packages/pika/channel.py - 529 - INFO - Closing channel (0): 'Normal shutdown' on <Channel number=1 OPEN conn=<SelectConnection OPEN socket=('192.168.3.239', 63559)->('120.131.14.225', 5672) params=<ConnectionParameters host=ops.xxoo.com port=5672 virtual_host=/event_engine ssl=False>>>
+2018-04-20 17:16:00,693 - pika.channel - /Library/Python/2.7/site-packages/pika/channel.py - 529 - INFO - Closing channel (0): 'Normal shutdown' on <Channel number=1 OPEN conn=<SelectConnection OPEN socket=('192.168.3.239', 63559)->('000.000.000.000', 5672) params=<ConnectionParameters host=ops.xxoo.com port=5672 virtual_host=/event_engine ssl=False>>>
 2018-04-20 17:16:00,693 - agent.util.amqp.sender - /Users/manmanli/xm-gits/xm2cloud_agent/agent/util/amqp/sender.py - 191 - INFO - Closing connection
 2018-04-20 17:16:00,694 - pika.connection - /Library/Python/2.7/site-packages/pika/connection.py - 1147 - INFO - Closing connection (200): Normal shutdown
-2018-04-20 17:16:00,694 - pika.connection - /Library/Python/2.7/site-packages/pika/connection.py - 1159 - INFO - Connection.close is waiting for 1 channels to close: <SelectConnection CLOSING socket=('192.168.3.239', 63559)->('120.131.14.225', 5672) params=<ConnectionParameters host=ops.xxoo.com port=5672 virtual_host=/event_engine ssl=False>>
+2018-04-20 17:16:00,694 - pika.connection - /Library/Python/2.7/site-packages/pika/connection.py - 1159 - INFO - Connection.close is waiting for 1 channels to close: <SelectConnection CLOSING socket=('192.168.3.239', 63559)->('000.000.000.000', 5672) params=<ConnectionParameters host=ops.xxoo.com port=5672 virtual_host=/event_engine ssl=False>>
 2018-04-20 17:16:00,694 - agent.util.amqp.sender - /Users/manmanli/xm-gits/xm2cloud_agent/agent/util/amqp/sender.py - 188 - INFO - Stopped
 Main process(83143) got GracefulExitException.
 2018-04-20 17:16:00,695 - agent.util.amqp.receiver - /Users/manmanli/xm-gits/xm2cloud_agent/agent/util/amqp/receiver.py - 162 - INFO - Stopping
