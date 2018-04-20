@@ -187,15 +187,8 @@ class PubEvent(BaseModel):
 
     @staticmethod
     def from_dict(data):
-        allfields = [
-            'event_uuid', 'event_id', 'chain_event_id', 'event_name', 'event_source', 'source_version',
-            'source_cluster_id', 'source_hostgroup_id', 'source_host_id', 'target_cluster_id', 'target_hostgroup_id',
-            'target_host_id', 'handled_event_id', 'handled_event_cluster_id', 'handled_event_hostgroup_id',
-            'handled_event_host_id', 'event_timestamp', 'event_data', 'enc_method', 'metric_uuid'
-        ]
-        allvalues = map(lambda k: data.get(k, None), allfields)
-
-        event = PubEvent(**dict(zip(allfields, allvalues)))
+        event = PubEvent()
+        map(lambda r: setattr(event, r[0], r[1]), data.iteritems())
 
         return event
 

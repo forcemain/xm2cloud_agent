@@ -98,3 +98,7 @@ class CacheHandler(object):
         file_path = os.path.join(path, name)
 
         File.write_content(data, file_path)
+
+    def abspath(self, name, cache_path=None):
+        _, file_path = self.exists(name, cache_path=cache_path)
+        return file_path

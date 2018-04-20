@@ -6,7 +6,7 @@ import imp
 import importlib
 
 
-def autodiscover_metric(package, package_path):
+def autodiscover_module(package, package_path):
     metrics_modules = []
 
     cur_dir = os.path.dirname(package_path)

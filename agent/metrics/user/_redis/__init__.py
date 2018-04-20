@@ -1,7 +1,15 @@
 #! -*- coding: utf-8 -*-
 
 
-from agent.util.loader import autodiscover_metric
+from functools import partial
+from agent.util.loader import autodiscover_module
 
 
-autodiscover_metric(__name__, __file__)
+autodiscover_module(__name__, __file__)
+# provide an automatic refresh interface
+"""
+example:
+    _redis.autodiscover()
+"""
+#
+autodiscover = partial(autodiscover_module, __name__, __file__)

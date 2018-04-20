@@ -67,8 +67,10 @@ class File(object):
     def force_move(spath, dpath):
         if not os.path.exists(spath):
             return
-        if not os.path.exists(dpath):
-            os.makedirs(dpath)
+
+        basedir = os.path.dirname(dpath)
+        if not os.path.exists(basedir):
+            os.makedirs(basedir)
         shutil.move(spath, dpath)
 
     @staticmethod

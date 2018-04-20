@@ -7,12 +7,17 @@ import time
 
 from agent import settings
 from threading import Thread
+from agent.util.enhance import File
 from multiprocessing import Process
 from agent.util.logger import Logger
+# autodiscovery engine handler
+from agent.handler.engine import host
+from agent.handler.engine import user
 from datetime import datetime, timedelta
 from agent.models.event.pub_event import PubEvent
 from agent.exceptions import GracefulExitException
 from agent.handler.event.engine import EngineEventHandler
+from agent.handler.engine.baseengine import EngineHandlerFactory
 from agent.handler.channel.rabbitmq import RabbitMQChannelHandler
 
 
@@ -29,33 +34,45 @@ class EventThread(Thread):
         self._obj = obj
         self._fname, self._fcontent = event_data
 
-    def run_destructor(self):
+    def after_run(self):
         if self in _evnet_threads:
             _evnet_threads.remove(self)
-        self._obj.channel_handler.rcache_handler.remove(self._fname)
+        self._obj.channel_handler.ccache_handler.remove(self._fname)
+
+    def before_run(self):
+        source_file = self._obj.channel_handler.rcache_handler.abspath(self._fname)
+        target_file = self._obj.channel_handler.ccache_handler.abspath(self._fname)
+
+        File.force_move(source_file, target_file)
 
     def run(self):
+        self.before_run()
         try:
             event = PubEvent.from_json(self._fcontent)
             self._obj.event_dispatch(event)
         except Exception as e:
             logger.error('Handler %s got unexpected Exception %s', self._fname, e)
         finally:
-            self.run_destructor()
+            self.after_run()
 
 
 class Engine(Process):
-    def __init__(self, gsignal, engine_handler=None, channel_handler=None, event_handler=None):
+    def __init__(self, gsignal, engine_factory=None, channel_handler=None, event_handler=None):
         super(Engine, self).__init__()
 
         self._gsignal = gsignal
         self._event_handler = event_handler
-        self._engine_handler = engine_handler
+        self._engine_factory = engine_factory
         self._channel_handler = channel_handler
+        self._userdata = self.channel_handler.userdata_dao.get_user_data()
 
     @property
-    def engine_handler(self):
-        return self._engine_handler
+    def engine_factory(self):
+        if isinstance(self._engine_factory, EngineHandlerFactory):
+            return self._engine_factory
+        self._engine_factory = EngineHandlerFactory()
+
+        return self._engine_factory
 
     @property
     def channel_handler(self):
@@ -81,7 +98,7 @@ class Engine(Process):
         return next_time_str
 
     def run_destructor(self):
-        pass
+        self.channel_handler.ccache_handler.clear()
 
     def event_get(self):
         # default batch is 50, can be set larger
@@ -89,16 +106,95 @@ class Engine(Process):
 
         return events_data
 
+    def require_handle(self, event):
+        is_require = False
+
+        # get source from userdata event
+        host_id = self._userdata.get_host_id()
+        cluster_id = self._userdata.get_cluster_id()
+        hostgroup_id = self._userdata.get_hostgroup_id()
+
+        # get target_... from server event
+        target_host_id = event.get_target_host_id()
+        target_cluster_id = event.get_target_cluster_id()
+        target_hostgroup_id = event.get_target_hostgroup_id()
+
+        # is it my task ?
+        if isinstance(target_host_id, list) and host_id in target_host_id:
+            is_require = True
+        if isinstance(target_hostgroup_id, list) and isinstance(hostgroup_id, list) and (
+            set(target_hostgroup_id) & set(hostgroup_id)
+        ):
+            is_require = True
+        if isinstance(target_cluster_id, list) and isinstance(cluster_id, list) and (
+            set(target_cluster_id) & set(cluster_id)
+        ):
+            is_require = True
+
+        return is_require
+
+    def allow_dispatch(self, event):
+        is_allow = True
+
+        if not self.require_handle(event):
+            is_allow = False
+            logger.warning('Not own engien event data: {0}'.format(event))
+        if event.is_adjunct():
+            is_allow = False
+            self.event_response(event)
+            logger.warning('Adjunct engine event data: {0}'.format(event))
+        if not event.is_valid():
+            is_allow = False
+            logger.warning('Invalid engine event data: {0}'.format(event))
+        # default expired 180s
+        if event.is_expired():
+            is_allow = False
+            logger.warning('Expired engine event data: {0}'.format(event))
+
+        return is_allow
+
+    def event_history(self):
+        """May be you want local history
+        """
+        pass
+
+    def event_response(self, event, retcode=0, result=None):
+        event_id = event.get_event_id()
+        handled_event_id = event.get_handled_event_id()
+        event_name = 'response_{0}'.format(event.get_event_name())
+        handled_event_host_id = event.get_handled_event_host_id()
+        handled_event_cluster_id = event.get_handled_event_cluster_id()
+        handled_event_hostgroup_id = event.get_handled_event_hostgroup_id()
+
+        logger.info('Send {0} event, retcode: {1}, result: {2}'.format(event_name, retcode, result))
+
+        resp_event = self.event_handler.create_event(event_name)
+        resp_event.set_chain_event_id(event_id)
+        resp_event.set_handled_event_id(handled_event_id)
+        resp_event.set_handled_event_host_id(handled_event_host_id)
+        resp_event.set_handled_event_cluster_id(handled_event_cluster_id)
+        resp_event.set_handled_event_hostgroup_id(handled_event_hostgroup_id)
+
+        if result is not None:
+            data = result.to_json()
+            enc_method, event_data = self.event_handler.encrypt_data(data)
+            resp_event.set_enc_method(enc_method)
+            resp_event.set_event_data(event_data)
+        self.channel_handler.wcache_handler.write(resp_event.to_json())
+
     def event_dispatch(self, event):
-        # Todo:
-        #   1. dispatch event with eventfactory
-        #   2. logging event lifecycle log and asynchronous send
-        #   3. event test
-        #       3.1. is valid ?
-        #       3.2. is expired ? ( half hour ago. )
-        #       3.3. is choreography ? ( handler later. )
-        #
-        print event
+        retcode = None
+
+        if not self.allow_dispatch(event):
+            return
+        try:
+            event_name = event.get_event_name()
+            handler = self.engine_factory.create_handler(event_name)
+            retcode = handler.dispose(event)
+        except Exception as e:
+            logger.error('Handle event: {0} with exception: {1}'.format(event, e))
+        finally:
+            self.event_response(event, retcode=retcode)
 
     def run(self):
         try:
