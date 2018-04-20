@@ -13,7 +13,7 @@ class PubEvent(BaseModel):
                  source_version=get_version(), source_cluster_id=None, source_hostgroup_id=None, source_host_id=None,
                  target_cluster_id=None, target_hostgroup_id=None, target_host_id=None, handled_event_id=None,
                  handled_event_cluster_id=None, handled_event_hostgroup_id=None, handled_event_host_id=None,
-                 event_timestamp=None, event_data=None, enc_method=None, metric_uuid=None):
+                 event_timestamp=None, event_data=None, enc_method=None, metric_uuid=None, response_code=None):
 
         self.event_id = event_id
         self.event_data = event_data
@@ -22,6 +22,7 @@ class PubEvent(BaseModel):
         self.enc_method = enc_method
         self.metric_uuid = metric_uuid
         self.event_source = event_source
+        self.response_code = response_code
         self.target_host_id = target_host_id
         self.source_version = source_version
         self.chain_event_id = chain_event_id
@@ -77,6 +78,12 @@ class PubEvent(BaseModel):
 
     def set_event_source(self, event_source):
         self.event_source = event_source
+
+    def get_response_code(self):
+        return self.response_code
+
+    def set_response_code(self, response_code):
+        self.response_code = response_code
 
     def get_target_host_id(self):
         return self.target_host_id
@@ -165,6 +172,7 @@ class PubEvent(BaseModel):
             'event_uuid': self.get_event_uuid(),
             'metric_uuid': self.get_metric_uuid(),
             'event_source': self.get_event_source(),
+            'response_code': self.get_response_code(),
             'target_host_id': self.get_target_host_id(),
             'source_version': self.get_source_version(),
             'chain_event_id': self.get_chain_event_id(),

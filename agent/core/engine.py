@@ -141,7 +141,7 @@ class Engine(Process):
             logger.warning('Not own engien event data: {0}'.format(event))
         if event.is_adjunct():
             is_allow = False
-            self.event_response(event)
+            # self.event_response(event, retcode=0)
             logger.warning('Adjunct engine event data: {0}'.format(event))
         if not event.is_valid():
             is_allow = False
@@ -158,28 +158,23 @@ class Engine(Process):
         """
         pass
 
-    def event_response(self, event, retcode=0, result=None):
-        event_id = event.get_event_id()
-        handled_event_id = event.get_handled_event_id()
+    def event_response(self, event, retcode=0):
+        handled_event_id = event_id = event.get_event_id()
         event_name = 'response_{0}'.format(event.get_event_name())
-        handled_event_host_id = event.get_handled_event_host_id()
-        handled_event_cluster_id = event.get_handled_event_cluster_id()
-        handled_event_hostgroup_id = event.get_handled_event_hostgroup_id()
+        handled_event_host_id = event.get_target_host_id()
+        handled_event_cluster_id = event.get_target_cluster_id()
+        handled_event_hostgroup_id = event.get_target_hostgroup_id()
 
-        logger.info('Send {0} event, retcode: {1}, result: {2}'.format(event_name, retcode, result))
+        logger.info('Send {0} event response, retcode: {1}'.format(event_name, retcode))
 
         resp_event = self.event_handler.create_event(event_name)
+        resp_event.set_response_code(retcode)
         resp_event.set_chain_event_id(event_id)
         resp_event.set_handled_event_id(handled_event_id)
         resp_event.set_handled_event_host_id(handled_event_host_id)
         resp_event.set_handled_event_cluster_id(handled_event_cluster_id)
         resp_event.set_handled_event_hostgroup_id(handled_event_hostgroup_id)
 
-        if result is not None:
-            data = result.to_json()
-            enc_method, event_data = self.event_handler.encrypt_data(data)
-            resp_event.set_enc_method(enc_method)
-            resp_event.set_event_data(event_data)
         self.channel_handler.wcache_handler.write(resp_event.to_json())
 
     def event_dispatch(self, event):
