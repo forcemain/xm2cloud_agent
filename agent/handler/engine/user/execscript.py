@@ -16,7 +16,7 @@ logger = Logger.get_logger(__name__)
 
 class ExecuteScriptEngineHandler(BaseEngineHandler):
     enable = True
-    name = 'execute_script'
+    name = 'execscript'
 
     def get_uscript(self, event):
         script_file, script_obj = None, None
