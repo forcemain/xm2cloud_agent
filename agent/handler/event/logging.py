@@ -25,8 +25,8 @@ class LoggingEventHandler(BaseEventHandler):
         logger_event.set_message(message)
 
         # may be you want encrypt the data
-        enc_method, event_data = self.encrypt_data(logger_event.to_json())
-        engine_event.set_enc_method(enc_method)
+        encryption, event_data = self.encrypt_data(logger_event.to_json())
+        engine_event.set_encryption(encryption)
         engine_event.set_event_data(event_data)
 
         return engine_event

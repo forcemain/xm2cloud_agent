@@ -9,23 +9,22 @@ from agent import get_name, get_version
 
 
 class PubEvent(BaseModel):
-    def __init__(self, event_uuid=None, event_id=None, chain_event_id=None, event_name=None, event_source=get_name(),
+    def __init__(self, agent_uuid=None, event_uuid=None, event_id=None, event_name=None, event_source=get_name(),
                  source_version=get_version(), source_cluster_id=None, source_hostgroup_id=None, source_host_id=None,
                  target_cluster_id=None, target_hostgroup_id=None, target_host_id=None, handled_event_id=None,
                  handled_event_cluster_id=None, handled_event_hostgroup_id=None, handled_event_host_id=None,
-                 event_timestamp=None, event_data=None, enc_method=None, metric_uuid=None, response_code=None):
+                 event_timestamp=None, event_data=None, encryption=None, response_code=None):
 
         self.event_id = event_id
+        self.agent_uuid = agent_uuid
         self.event_data = event_data
         self.event_name = event_name
         self.event_uuid = event_uuid
-        self.enc_method = enc_method
-        self.metric_uuid = metric_uuid
+        self.encryption = encryption
         self.event_source = event_source
         self.response_code = response_code
         self.target_host_id = target_host_id
         self.source_version = source_version
-        self.chain_event_id = chain_event_id
         self.source_host_id = source_host_id
         self.event_timestamp = event_timestamp
         self.handled_event_id = handled_event_id
@@ -43,17 +42,17 @@ class PubEvent(BaseModel):
     def set_event_id(self, event_id):
         self.event_id = event_id
 
-    def get_metric_uuid(self):
-        return self.metric_uuid
+    def get_agent_uuid(self):
+        return self.agent_uuid
 
-    def set_metric_uuid(self, metric_uuid):
-        self.metric_uuid = metric_uuid
+    def set_agent_uuid(self, agent_uuid):
+        self.agent_uuid = agent_uuid
 
-    def get_enc_method(self):
-        return self.enc_method
+    def get_encryption(self):
+        return self.encryption
 
-    def set_enc_method(self, enc_method):
-        self.enc_method = enc_method
+    def set_encryption(self, encryption):
+        self.encryption = encryption
 
     def get_event_data(self):
         return self.event_data
@@ -96,12 +95,6 @@ class PubEvent(BaseModel):
 
     def set_source_version(self, source_version):
         self.source_version = source_version
-
-    def get_chain_event_id(self):
-        return self.chain_event_id
-
-    def set_chain_event_id(self, chain_event_id):
-        self.chain_event_id = chain_event_id
 
     def get_source_host_id(self):
         return self.source_host_id
@@ -168,14 +161,12 @@ class PubEvent(BaseModel):
             'event_id': self.get_event_id(),
             'event_data': self.get_event_data(),
             'event_name': self.get_event_name(),
-            'enc_method': self.get_enc_method(),
+            'encryption': self.get_encryption(),
             'event_uuid': self.get_event_uuid(),
-            'metric_uuid': self.get_metric_uuid(),
             'event_source': self.get_event_source(),
             'response_code': self.get_response_code(),
             'target_host_id': self.get_target_host_id(),
             'source_version': self.get_source_version(),
-            'chain_event_id': self.get_chain_event_id(),
             'source_host_id': self.get_source_host_id(),
             'event_timestamp': self.get_event_timestamp(),
             'handled_event_id': self.get_handled_event_id(),

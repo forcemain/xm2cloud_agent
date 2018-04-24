@@ -18,14 +18,14 @@ class MonitorEventHandler(BaseEventHandler):
         event.set_event_uuid(Random.get_uuid())
         event.set_event_name(EventType.MONITORING)
         event.set_source_host_id(userdata.get_host_id())
-        event.set_metric_uuid(userdata.get_metric_uuid())
+        event.set_agent_uuid(userdata.get_agent_uuid())
         event.set_event_timestamp(int(time.time()))
         event.set_source_cluster_id(userdata.get_cluster_id())
         event.set_source_hostgroup_id(userdata.get_hostgroup_id())
 
         # may be you want encrypt the data
-        enc_method, event_data = self.encrypt_data(data)
-        event.set_enc_method(enc_method)
+        encryption, event_data = self.encrypt_data(data)
+        event.set_encryption(encryption)
         event.set_event_data(event_data)
 
         return event

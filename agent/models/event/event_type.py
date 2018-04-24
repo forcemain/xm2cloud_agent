@@ -2,9 +2,9 @@
 
 
 class EventType(object):
-    READY = 'ready'
     LOGGING = 'logging'
     HEARTBEAT = 'heartbeat'
     MONITORING = 'monitoring'
-    EXECUTESCRIPT = 'execute_script'
+    EXECUTESCRIPT = 'execscript'
+
 

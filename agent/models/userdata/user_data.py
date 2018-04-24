@@ -9,16 +9,13 @@ from agent.models import BaseModel
 
 class UserData(BaseModel):
     def __init__(self, host_id=None, cluster_id=None, hostgroup_id=None, rabbitmq_ssl=None, rabbitmq_port=None,
-                 host_name=None, rabbitmq_vhost=None, rabbitmq_host=None, rabbitmq_exchange_type=None,
-                 rabbitmq_up_queue=None, rabbitmq_down_queue=None, rabbitmq_auth_user=None, rabbitmq_routing_key=None,
-                 rabbitmq_up_exchange=None, rabbitmq_down_exchange=None, metric_uuid=None, consumer_key=None,
-                 rabbitmq_auth_pass=None):
+                 rabbitmq_vhost=None, rabbitmq_host=None, rabbitmq_exchange_type=None, rabbitmq_up_queue=None,
+                 rabbitmq_down_queue=None, rabbitmq_auth_user=None, rabbitmq_routing_key=None,
+                 rabbitmq_up_exchange=None, rabbitmq_down_exchange=None, agent_uuid=None, rabbitmq_auth_pass=None):
 
         self.host_id = host_id
-        self.host_name = host_name
         self.cluster_id = cluster_id
-        self.metric_uuid = metric_uuid
-        self.consumer_key = consumer_key
+        self.agent_uuid = agent_uuid
         self.hostgroup_id = hostgroup_id
         self.rabbitmq_ssl = rabbitmq_ssl
         self.rabbitmq_host = rabbitmq_host
@@ -39,29 +36,17 @@ class UserData(BaseModel):
     def set_host_id(self, host_id):
         self.host_id = host_id
 
-    def get_host_name(self):
-        return self.host_name
-
-    def set_host_name(self, host_name):
-        self.host_name = host_name
-
     def get_cluster_id(self):
         return self.cluster_id
 
     def set_cluster_id(self, cluster_id):
         self.cluster_id = cluster_id
 
-    def get_metric_uuid(self):
-        return self.metric_uuid
+    def get_agent_uuid(self):
+        return self.agent_uuid
 
-    def set_metric_uuid(self, metric_uuid):
-        self.metric_uuid = metric_uuid
-
-    def get_consumer_key(self):
-        return self.consumer_key
-
-    def set_consumer_key(self, consumer_key):
-        self.consumer_key = consumer_key
+    def set_agent_uuid(self, agent_uuid):
+        self.agent_uuid = agent_uuid
 
     def get_hostgroup_id(self):
         return self.hostgroup_id
@@ -144,10 +129,8 @@ class UserData(BaseModel):
     def to_dict(self):
         data = {
             'host_id': self.get_host_id(),
-            'host_name': self.get_host_name(),
             'cluster_id': self.get_cluster_id(),
-            'metric_uuid': self.get_metric_uuid(),
-            'consumer_key': self.get_consumer_key(),
+            'agent_uuid': self.get_agent_uuid(),
             'hostgroup_id': self.get_hostgroup_id(),
             'rabbitmq_ssl': self.get_rabbitmq_ssl(),
             'rabbitmq_host': self.get_rabbitmq_host(),
@@ -170,15 +153,8 @@ class UserData(BaseModel):
 
     @staticmethod
     def from_dict(data):
-        allfields = [
-            'host_id', 'cluster_id', 'hostgroup_id', 'rabbitmq_ssl', 'rabbitmq_port', 'host_name', 'rabbitmq_vhost',
-            'rabbitmq_host', 'rabbitmq_exchange_type', 'rabbitmq_up_queue', 'rabbitmq_down_queue', 'rabbitmq_auth_user',
-            'rabbitmq_routing_key', 'rabbitmq_up_exchange', 'rabbitmq_down_exchange', 'metric_uuid', 'consumer_key',
-            'rabbitmq_auth_pass'
-        ]
-        allvalues = map(lambda k: data.get(k, None), allfields)
-
-        event = UserData(**dict(zip(allfields, allvalues)))
+        event = UserData()
+        map(lambda r: setattr(event, r[0], r[1]), data.iteritems())
 
         return event
 
