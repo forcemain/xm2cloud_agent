@@ -3,6 +3,7 @@
 
 import os
 import time
+import json
 
 
 from agent import settings
@@ -86,9 +87,10 @@ class Monitor(Process):
                 logger.warning('Invalid monitor event data: {0}'.format(ins))
                 continue
             logger.debug('Verified monitor event data: {0}'.format(ins))
-            event = self.event_handler.create_event(ins.to_json())
-
-            self.channel_handler.wcache_handler.write(event.to_json())
+            for ins_data in ins.to_dict().itervalues():
+                data = json.dumps(ins_data, indent=4)
+                event = self.event_handler.create_event(data)
+                self.channel_handler.wcache_handler.write(event.to_json())
 
     def run_destructor(self):
         pass

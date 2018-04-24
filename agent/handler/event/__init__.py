@@ -17,9 +17,9 @@ class BaseEventHandler(object):
         return self._userdata_dao
 
     def encrypt_data(self, data):
-        enc_method = None
+        encryption = None
 
-        return enc_method, data
+        return encryption, data
 
     def create_event(self, *args, **kwargs):
         raise NotImplementedError

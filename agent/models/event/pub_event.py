@@ -159,6 +159,7 @@ class PubEvent(BaseModel):
     def to_dict(self):
         data = {
             'event_id': self.get_event_id(),
+            'agent_uuid': self.get_agent_uuid(),
             'event_data': self.get_event_data(),
             'event_name': self.get_event_name(),
             'encryption': self.get_encryption(),

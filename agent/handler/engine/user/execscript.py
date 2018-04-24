@@ -8,6 +8,7 @@ import subprocess
 
 
 from agent.util.logger import Logger
+from agent.models.event.event_type import EventType
 from agent.models.event.user_script import UserScript
 from agent.handler.engine.baseengine import BaseEngineHandler
 
@@ -16,7 +17,7 @@ logger = Logger.get_logger(__name__)
 
 class ExecuteScriptEngineHandler(BaseEngineHandler):
     enable = True
-    name = 'execscript'
+    name = EventType.EXECUTESCRIPT
 
     def get_uscript(self, event):
         script_file, script_obj = None, None
