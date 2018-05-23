@@ -8,7 +8,7 @@ from concurrent import futures
 from agent.metrics import host
 from agent.metrics import user
 from threadpool import ThreadPool
-from agent.util.logger import Logger
+from agent.common.logger import Logger
 
 
 logger = Logger.get_logger(__name__)

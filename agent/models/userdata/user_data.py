@@ -11,11 +11,10 @@ class UserData(BaseModel):
     def __init__(self, host_id=None, cluster_id=None, hostgroup_id=None, rabbitmq_ssl=None, rabbitmq_port=None,
                  rabbitmq_vhost=None, rabbitmq_host=None, rabbitmq_exchange_type=None, rabbitmq_up_queue=None,
                  rabbitmq_down_queue=None, rabbitmq_auth_user=None, rabbitmq_routing_key=None,
-                 rabbitmq_up_exchange=None, rabbitmq_down_exchange=None, agent_uuid=None, rabbitmq_auth_pass=None):
+                 rabbitmq_up_exchange=None, rabbitmq_down_exchange=None, rabbitmq_auth_pass=None):
 
         self.host_id = host_id
         self.cluster_id = cluster_id
-        self.agent_uuid = agent_uuid
         self.hostgroup_id = hostgroup_id
         self.rabbitmq_ssl = rabbitmq_ssl
         self.rabbitmq_host = rabbitmq_host
@@ -41,12 +40,6 @@ class UserData(BaseModel):
 
     def set_cluster_id(self, cluster_id):
         self.cluster_id = cluster_id
-
-    def get_agent_uuid(self):
-        return self.agent_uuid
-
-    def set_agent_uuid(self, agent_uuid):
-        self.agent_uuid = agent_uuid
 
     def get_hostgroup_id(self):
         return self.hostgroup_id
@@ -130,7 +123,6 @@ class UserData(BaseModel):
         data = {
             'host_id': self.get_host_id(),
             'cluster_id': self.get_cluster_id(),
-            'agent_uuid': self.get_agent_uuid(),
             'hostgroup_id': self.get_hostgroup_id(),
             'rabbitmq_ssl': self.get_rabbitmq_ssl(),
             'rabbitmq_host': self.get_rabbitmq_host(),

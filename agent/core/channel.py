@@ -9,9 +9,9 @@ from agent import settings
 from threading import Thread
 from functools import partial
 from multiprocessing import Process
-from agent.util.logger import Logger
+from agent.common.logger import Logger
 from datetime import datetime, timedelta
-from agent.util.amqp.status import AMQPStatus
+from agent.common.amqp.status import AMQPStatus
 from agent.exceptions import GracefulExitException
 from agent.handler.channel.rabbitmq import RabbitMQChannelHandler
 

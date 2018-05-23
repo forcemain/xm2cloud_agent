@@ -6,9 +6,9 @@ import time
 
 
 from agent import settings
-from agent.util.logger import Logger
-from agent.util.amqp.sender import AMQPSender
-from agent.util.amqp.receiver import AMQPReceiver
+from agent.common.logger import Logger
+from agent.common.amqp.sender import AMQPSender
+from agent.common.amqp.receiver import AMQPReceiver
 from agent.handler.channel import BaseChannelHelper, BaseChannelHandler
 
 

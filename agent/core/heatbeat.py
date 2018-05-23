@@ -7,7 +7,7 @@ import time
 
 from agent import settings
 from multiprocessing import Process
-from agent.util.logger import Logger
+from agent.common.logger import Logger
 from datetime import datetime, timedelta
 from agent.exceptions import GracefulExitException
 from agent.handler.heartbeat import HeartbeatHandler

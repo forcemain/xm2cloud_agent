@@ -1,7 +1,7 @@
 #! -*- coding: utf-8 -*-
 
 
-from agent.util.logger import Logger
+from agent.common.logger import Logger
 from agent.handler.engine.baseengine import BaseEngineHandler
 
 

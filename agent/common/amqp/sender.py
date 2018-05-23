@@ -6,8 +6,8 @@ import pika
 import time
 
 
-from agent.util.logger import Logger
-from agent.util.amqp.status import AMQPStatus
+from agent.common.logger import Logger
+from agent.common.amqp.status import AMQPStatus
 
 
 logger = Logger.get_logger(__name__)

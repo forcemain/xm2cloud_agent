@@ -7,7 +7,7 @@ import tempfile
 import subprocess
 
 
-from agent.util.logger import Logger
+from agent.common.logger import Logger
 from agent.models.event.event_type import EventType
 from agent.models.event.user_script import UserScript
 from agent.handler.engine.baseengine import BaseEngineHandler

@@ -5,7 +5,7 @@ import psutil
 
 
 from functools import partial
-from agent.util.enhance import Switch
+from agent.common.enhance import Switch
 from agent.metrics.basemetric import BaseMetric
 from agent.metrics.metric_data import MetricData
 from agent.metrics.basecollect import BaseCollector

@@ -9,14 +9,13 @@ from agent import get_name, get_version
 
 
 class PubEvent(BaseModel):
-    def __init__(self, agent_uuid=None, event_uuid=None, event_id=None, event_name=None, event_source=get_name(),
+    def __init__(self, event_uuid=None, event_id=None, event_name=None, event_source=get_name(),
                  source_version=get_version(), source_cluster_id=None, source_hostgroup_id=None, source_host_id=None,
                  target_cluster_id=None, target_hostgroup_id=None, target_host_id=None, handled_event_id=None,
                  handled_event_cluster_id=None, handled_event_hostgroup_id=None, handled_event_host_id=None,
                  event_timestamp=None, event_data=None, encryption=None, response_code=None):
 
         self.event_id = event_id
-        self.agent_uuid = agent_uuid
         self.event_data = event_data
         self.event_name = event_name
         self.event_uuid = event_uuid
@@ -41,12 +40,6 @@ class PubEvent(BaseModel):
 
     def set_event_id(self, event_id):
         self.event_id = event_id
-
-    def get_agent_uuid(self):
-        return self.agent_uuid
-
-    def set_agent_uuid(self, agent_uuid):
-        self.agent_uuid = agent_uuid
 
     def get_encryption(self):
         return self.encryption
@@ -159,7 +152,6 @@ class PubEvent(BaseModel):
     def to_dict(self):
         data = {
             'event_id': self.get_event_id(),
-            'agent_uuid': self.get_agent_uuid(),
             'event_data': self.get_event_data(),
             'event_name': self.get_event_name(),
             'encryption': self.get_encryption(),

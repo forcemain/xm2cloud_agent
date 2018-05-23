@@ -4,8 +4,8 @@
 import sys
 
 
-from agent.util.logger import Logger
 from agent.core.engine import Engine
+from agent.common.logger import Logger
 from agent.core.monitor import Monitor
 from agent.core.channel import Channel
 from agent.database import get_agentdir

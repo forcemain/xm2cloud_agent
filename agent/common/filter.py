@@ -1,7 +1,7 @@
 #! -*- coding: utf-8 -*-
 
 
-from agent.util.tree import Node
+from agent.common.tree import Node
 
 
 class Q(Node):

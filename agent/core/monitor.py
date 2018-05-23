@@ -3,16 +3,16 @@
 
 import os
 import time
-import json
 
 
 from agent import settings
 from threadpool import makeRequests
 from multiprocessing import Process
-from agent.util.logger import Logger
+from agent.common.logger import Logger
 from datetime import datetime, timedelta
 from agent.metrics.baseloader import BaseLoader
 from agent.handler.monitor import MonitorHandler
+from agent.metrics.metric_data import MetricData
 from agent.exceptions import GracefulExitException
 from agent.metrics.basecollect import BaseCollector
 from agent.handler.event.monitor import MonitorEventHandler
@@ -82,14 +82,14 @@ class Monitor(Process):
     def event_put(self, task, res):
         self._task_map.pop(task.requestID)
 
-        for ins in res:
-            if not ins.is_valid():
-                logger.warning('Invalid monitor event data: {0}'.format(ins))
+        for metric in res:
+            if not metric.is_valid():
+                logger.warning('Invalid monitor event data: {0}'.format(metric))
                 continue
-            logger.debug('Verified monitor event data: {0}'.format(ins))
-            for ins_data in ins.to_dict().itervalues():
-                data = json.dumps(ins_data, indent=4)
-                event = self.event_handler.create_event(data)
+            logger.debug('Verified monitor event data: {0}'.format(metric))
+            for item in metric.to_dict().itervalues():
+                edata = MetricData.from_dict(item).to_json()
+                event = self.event_handler.create_event(edata)
                 self.channel_handler.wcache_handler.write(event.to_json())
 
     def run_destructor(self):

@@ -7,9 +7,9 @@ import time
 
 from agent import settings
 from threading import Thread
-from agent.util.enhance import File
 from multiprocessing import Process
-from agent.util.logger import Logger
+from agent.common.enhance import File
+from agent.common.logger import Logger
 # autodiscovery engine handler
 from agent.handler.engine import host
 from agent.handler.engine import user

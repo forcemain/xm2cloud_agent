@@ -1,9 +1,3 @@
-### For Arch:
-#### xm2cloud_agent is a powerful and graceful engine component for xm2cloud devops framework.
-
-
-### For Task:
-```
 {
 	"event_uuid": null,
 	"event_source": "xm2cloud_agent",
@@ -15,7 +9,7 @@
 	"event_data": "{\"interpreter\": \"bash\", \"scripttext\": \"ping www.baidu.com\"}",
 	"handled_event_host_id": null,
 	"encryption": null,
-	"event_timestamp": 1527059093,
+	"event_timestamp": 1527068976,
 	"source_version": "0.0.1",
 	"handled_event_cluster_id": null,
 	"event_name": "execscript",
@@ -24,11 +18,3 @@
 	"source_hostgroup_id": null,
 	"handled_event_hostgroup_id": null
 }
-```
-
-### For Debug:
-
-
-```
-
-```

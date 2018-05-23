@@ -5,7 +5,7 @@ import os
 
 
 from agent import database
-from agent.util.logger import Logger
+from agent.common.logger import Logger
 from agent.dao.userdata import UserDataDao
 from agent.handler.cache import CacheHandler
 

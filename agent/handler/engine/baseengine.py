@@ -1,7 +1,7 @@
 #! -*- coding: utf-8 -*-
 
 
-from agent.util.logger import Logger
+from agent.common.logger import Logger
 from agent.handler.event.logging import LoggingEventHandler
 from agent.handler.channel.rabbitmq import RabbitMQChannelHandler
 

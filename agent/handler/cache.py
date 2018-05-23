@@ -7,8 +7,8 @@ import shutil
 import itertools
 
 
-from agent.util.logger import Logger
-from agent.util.enhance import File, Random
+from agent.common.logger import Logger
+from agent.common.enhance import File, Random
 
 
 logger = Logger.get_logger(__name__)
