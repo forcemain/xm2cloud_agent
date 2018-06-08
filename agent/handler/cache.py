@@ -38,7 +38,7 @@ class CacheHandler(object):
             return
         try:
             os.remove(file_path)
-        finally:
+        except OSError:
             pass
 
     def fsize(self, name, cache_path=None):
@@ -73,7 +73,7 @@ class CacheHandler(object):
         for f in glob_files:
             try:
                 os.remove(f)
-            finally:
+            except OSError:
                 pass
 
     def read(self, cache_path=None, batch=50, suffix='json'):
