@@ -43,6 +43,7 @@ class ExecuteScriptEngineHandler(BaseEngineHandler):
         event_data = event.get_event_data()
         logger.debug('{0} execute script: {1}'.format(self.real_name, event_data))
 
+        return_code = 1314
         script_file, script_obj = self.get_uscript(event)
         command = '{0} {1}'.format(script_obj.get_interpreter(), script_file.name)
         os.environ.update({'PYTHONIOENCODING': 'utf-8'})
@@ -56,18 +57,20 @@ class ExecuteScriptEngineHandler(BaseEngineHandler):
             if p_during > p_timeout:
                 p.terminate()
                 interrupt = True
+                return_code = 1312
             logger.debug('Event: {0}(timeout: {1}s) left {2} secomnds force exit'.format(
                 event_id, p_timeout, p_timeout - p_during
             ))
             self.info(event, p.stdout.readline())
         if interrupt is False and p.returncode != 0:
+            return_code = 1313
             map(lambda err: self.error(event, err), p.stderr)
         try:
             script_file.close()
         finally:
             pass
 
-        return p.returncode
+        return return_code
 
 
 

@@ -178,10 +178,19 @@ class Engine(Process):
         self.channel_handler.wcache_handler.write(resp_event.to_json())
 
     def event_dispatch(self, event):
-        retcode = None
+        """
+        1310 等待
+        1311 执行
+        1312 超时
+        1313 失败
+        1314 成功
+        1315 未知
+        """
+        retcode = 1315
 
         if not self.allow_dispatch(event):
             return
+        self.event_response(event, retcode=1311)
         try:
             event_name = event.get_event_name()
             handler = self.engine_factory.create_handler(event_name)
