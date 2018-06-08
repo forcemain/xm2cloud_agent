@@ -141,14 +141,17 @@ class BaseEngineHandler(object):
         raise NotImplementedError
 
     def dispose(self, event):
+        retcode = 1314
         self.before_dispose(event)
         try:
-            return self.handle(event)
+            retcode = self.handle(event)
         except Exception as e:
             self.dispose_exception(event, e)
             logger.error('{0} handle event: {1} with error: {2}'.format(self.real_name, event, e))
         finally:
             self.after_dispose(event)
+
+        return retcode
 
 
 class EngineHandlerFactory(object):
