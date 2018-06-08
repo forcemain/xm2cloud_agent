@@ -36,7 +36,10 @@ class CacheHandler(object):
         if os.path.isdir(file_path):
             shutil.rmtree(file_path)
             return
-        os.remove(file_path)
+        try:
+            os.remove(file_path)
+        finally:
+            pass
 
     def fsize(self, name, cache_path=None):
         exists, file_path = self.exists(name, cache_path=cache_path)
@@ -70,8 +73,8 @@ class CacheHandler(object):
         for f in glob_files:
             try:
                 os.remove(f)
-            except OSError as _:
-                continue
+            finally:
+                pass
 
     def read(self, cache_path=None, batch=50, suffix='json'):
         event_data = []
