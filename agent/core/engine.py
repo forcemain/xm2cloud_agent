@@ -168,6 +168,7 @@ class Engine(Process):
         logger.info('Send {0} event response, retcode: {1}'.format(event_name, retcode))
 
         resp_event = self.event_handler.create_event(event_name)
+        resp_event.set_event_id(event_id)
         resp_event.set_response_code(retcode)
         resp_event.set_handled_event_id(handled_event_id)
         resp_event.set_handled_event_host_id(handled_event_host_id)

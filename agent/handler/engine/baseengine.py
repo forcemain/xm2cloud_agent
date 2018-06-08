@@ -143,7 +143,7 @@ class BaseEngineHandler(object):
     def dispose(self, event):
         self.before_dispose(event)
         try:
-            self.handle(event)
+            return self.handle(event)
         except Exception as e:
             self.dispose_exception(event, e)
             logger.error('{0} handle event: {1} with error: {2}'.format(self.real_name, event, e))

@@ -67,7 +67,7 @@ class ExecuteScriptEngineHandler(BaseEngineHandler):
             map(lambda err: self.error(event, err), p.stderr)
         try:
             script_file.close()
-        finally:
+        except (IOError, OSError):
             pass
 
         return return_code
