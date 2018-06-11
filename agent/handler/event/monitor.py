@@ -18,7 +18,7 @@ class MonitorEventHandler(BaseEventHandler):
         event.set_event_uuid(Random.get_uuid())
         event.set_event_name(EventType.MONITORING)
         event.set_source_host_id(userdata.get_host_id())
-        event.set_event_timestamp(int(time.time()))
+        event.set_event_timestamp(time.time())
         event.set_source_cluster_id(userdata.get_cluster_id())
         event.set_source_hostgroup_id(userdata.get_hostgroup_id())
 

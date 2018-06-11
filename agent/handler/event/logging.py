@@ -17,7 +17,7 @@ class LoggingEventHandler(BaseEventHandler):
         event_engine = EngineEventHandler()
         engine_event = event_engine.create_event(EventType.LOGGING)
 
-        logger_event.set_created(int(time.time()))
+        logger_event.set_created(time.time())
         logger_event.set_asctime(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
         logger_event.set_threadname(threading.current_thread().name)
         logger_event.set_thread(threading.currentThread().ident)
