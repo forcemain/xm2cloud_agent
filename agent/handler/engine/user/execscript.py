@@ -52,7 +52,7 @@ class ExecuteScriptEngineHandler(BaseEngineHandler):
         p_timeout = script_obj.get_timeout()
         p_running = time.time()
         interrupt = False
-        while p.poll() is None:
+        while True:
             p_during = time.time() - p_running
             if p_during > p_timeout:
                 p.terminate()
@@ -61,10 +61,17 @@ class ExecuteScriptEngineHandler(BaseEngineHandler):
             logger.debug('Event: {0}(timeout: {1}s) left {2} secomnds force exit'.format(
                 event_id, p_timeout, p_timeout - p_during
             ))
-            self.info(event, p.stdout.readline())
+            line = p.stdout.readline()
+            if line == b'' and p.poll() is not None:
+                break
+            self.info(event, line)
         if interrupt is False and p.returncode != 0:
             return_code = 1313
-            map(lambda err: self.error(event, err), p.stderr)
+            while True:
+                line = p.stderr.readline()
+                if line == b'':
+                    break
+                self.error(event, line)
         try:
             script_file.close()
         except (IOError, OSError):
