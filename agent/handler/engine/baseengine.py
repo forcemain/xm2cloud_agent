@@ -60,6 +60,7 @@ class BaseEngineHandler(object):
     def async_logging(self, levelname, event, message):
         if not message or not message.strip():
             return
+        message = message.strip()
         event_id = event.get_event_id()
         if levelname == 'INFO':
             logger.info('Event {0} stdout: {1}'.format(event_id, message))
