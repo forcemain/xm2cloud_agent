@@ -58,8 +58,7 @@ class BaseEngineHandler(object):
         return self._channel_handler
 
     def async_logging(self, levelname, event, message):
-        message = message.strip()
-        if not message:
+        if not message or not message.strip():
             return
         event_id = event.get_event_id()
         if levelname == 'INFO':
