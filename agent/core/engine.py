@@ -196,9 +196,7 @@ class Engine(Process):
             handler = self.engine_factory.create_handler(event_name)
             retcode = handler.dispose(event)
         except Exception as e:
-            import traceback
-            traceback.format_exc()
-            logger.error('Handle event: {0} with exception: {1}'.format(event, e))
+            logger.error('Handle event: {0} with exception: {1}'.format(event, e.message))
         finally:
             self.event_response(event, retcode=retcode)
 

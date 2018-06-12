@@ -49,9 +49,9 @@ class ExecuteScriptEngineHandler(BaseEngineHandler):
         os.environ.update({'PYTHONIOENCODING': 'utf-8'})
         p = subprocess.Popen(command, shell=True, close_fds=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                              env=os.environ)
-        p_timeout = script_obj.get_timeout()
-        p_running = time.time()
         interrupt = False
+        p_running = time.time()
+        p_timeout = int(script_obj.get_timeout())
         while True:
             p_during = time.time() - p_running
             if p_during > p_timeout:

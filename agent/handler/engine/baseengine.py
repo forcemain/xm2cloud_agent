@@ -58,7 +58,7 @@ class BaseEngineHandler(object):
         return self._channel_handler
 
     def async_logging(self, levelname, event, message):
-        if not message or not message.strip():
+        if not isinstance(message, (str, unicode)):
             return
         message = message.strip()
         event_id = event.get_event_id()
@@ -146,7 +146,7 @@ class BaseEngineHandler(object):
         try:
             retcode = self.handle(event)
         except Exception as e:
-            self.dispose_exception(event, e)
+            self.dispose_exception(event, e.message)
             logger.error('{0} handle event: {1} with error: {2}'.format(self.real_name, event, e))
         finally:
             self.after_dispose(event)
