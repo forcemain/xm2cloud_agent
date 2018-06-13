@@ -101,11 +101,11 @@ class BaseEngineHandler(object):
         if self.is_local_event(event):
             _message = 'Handle local event: {0} with exception: {1}'.format(event, message)
         else:
-            _message = 'Hanlde  outer event: {0} (host: {1}, hostgroup: {1}, cluster: {2}) with exception: {3}'.format(
+            _message = 'Hanlde  outer event: {0} (host: {1}, hostgroup: {2}, cluster: {3}) with exception: {4}'.format(
                 event, target_host_id, target_hostgroup_id, target_cluster_id, message
             )
         logger.error(_message)
-        self.async_logging('ERROR', event, message)
+        self.async_logging('ERROR', event, _message)
 
     def before_dispose(self, event):
         event_name = event.get_event_name()
