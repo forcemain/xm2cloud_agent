@@ -116,7 +116,7 @@ class BaseEngineHandler(object):
         if self.is_local_event(event):
             message = 'Start handle local event: {0}'.format(event_name)
         else:
-            message = 'Start handle outer event: {0} (host: {1}, hostgroup: {1}, cluster: {2})'.format(
+            message = 'Start handle outer event: {0} (host: {1}, hostgroup: {2}, cluster: {3})'.format(
                 event_name, target_host_id, target_hostgroup_id, target_cluster_id
             )
         logger.info(message)
@@ -131,7 +131,7 @@ class BaseEngineHandler(object):
         if self.is_local_event(event):
             message = 'Finish handle local event: {0}'.format(event_name)
         else:
-            message = 'Finish handle outer event: {0} (host: {1}, hostgroup: {1}, cluster: {2})'.format(
+            message = 'Finish handle outer event: {0} (host: {1}, hostgroup: {2}, cluster: {3})'.format(
                 event_name, target_host_id, target_hostgroup_id, target_cluster_id
             )
         logger.info(message)
