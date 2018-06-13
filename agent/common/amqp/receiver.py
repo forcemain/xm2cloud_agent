@@ -16,6 +16,7 @@ class AMQPReceiver(object):
         self._channel = None
         self._closing = False
         self._connection = None
+        self._temp_queue = None
         self._consumer_tag = None
         self._queue = kwargs.get('queue', None)
         self._exchange = kwargs.get('exchange', None)
@@ -82,9 +83,6 @@ class AMQPReceiver(object):
         self.add_on_channel_close_callback()
         self.setup_exchange(self._exchange)
 
-        # start consuming when channel open
-        self.start_consuming()
-
     def add_on_channel_close_callback(self):
         logger.info('Adding channel close callback')
         self._channel.add_on_close_callback(self.on_channel_closed)
@@ -98,7 +96,7 @@ class AMQPReceiver(object):
         logger.info('Declaring exchange %s', exchange_name)
         self._channel.exchange_declare(self.on_exchange_declareok,
                                        exchange_name,
-                                       self._exchange_type)
+                                       self._exchange_type, auto_delete=True)
 
     def on_exchange_declareok(self, unused_frame):
         logger.info('Exchange declared')
@@ -106,23 +104,25 @@ class AMQPReceiver(object):
 
     def setup_queue(self, queue_name):
         logger.info('Declaring queue %s', queue_name)
-        self._channel.queue_declare(self.on_queue_declareok, queue_name)
+        self._channel.queue_declare(self.on_queue_declareok, queue_name, exclusive=True, auto_delete=True)
 
     def on_queue_declareok(self, method_frame):
+        self._temp_queue = method_frame.method.queue
         logger.info('Binding %s to %s with %s',
-                    self._exchange, self._queue, self._routing_key)
-        self._channel.queue_bind(self.on_bindok, self._queue,
+                    self._exchange, self._temp_queue, self._routing_key)
+        self._channel.queue_bind(self.on_bindok, self._temp_queue,
                                  self._exchange, self._routing_key)
 
     def on_bindok(self, unused_frame):
         logger.info('Queue bound')
+        # start consuming when bind ok
         self.start_consuming()
 
     def start_consuming(self):
         logger.info('Issuing consumer related RPC commands')
         self.add_on_cancel_callback()
         self._consumer_tag = self._channel.basic_consume(self.on_message,
-                                                         self._queue)
+                                                         self._temp_queue)
 
     def add_on_cancel_callback(self):
         logger.info('Adding consumer cancellation callback')

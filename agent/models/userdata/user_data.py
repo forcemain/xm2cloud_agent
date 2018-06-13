@@ -9,9 +9,10 @@ from agent.models import BaseModel
 
 class UserData(BaseModel):
     def __init__(self, host_id=None, cluster_id=None, hostgroup_id=None, rabbitmq_ssl=None, rabbitmq_port=None,
-                 rabbitmq_vhost=None, rabbitmq_host=None, rabbitmq_exchange_type=None, rabbitmq_up_queue=None,
-                 rabbitmq_down_queue=None, rabbitmq_auth_user=None, rabbitmq_routing_key=None,
-                 rabbitmq_up_exchange=None, rabbitmq_down_exchange=None, rabbitmq_auth_pass=None):
+                 rabbitmq_vhost=None, rabbitmq_host=None, rabbitmq_auth_user=None, rabbitmq_auth_pass=None,
+                 rabbitmq_up_exchange_type=None, rabbitmq_down_exchange_type=None, rabbitmq_up_exchange=None,
+                 rabbitmq_down_exchange=None, rabbitmq_up_routing_key=None, rabbitmq_down_routing_key=None,
+                 rabbitmq_up_queue=None, rabbitmq_down_queue=None):
 
         self.host_id = host_id
         self.cluster_id = cluster_id
@@ -24,10 +25,12 @@ class UserData(BaseModel):
         self.rabbitmq_auth_user = rabbitmq_auth_user
         self.rabbitmq_auth_pass = rabbitmq_auth_pass
         self.rabbitmq_down_queue = rabbitmq_down_queue
-        self.rabbitmq_routing_key = rabbitmq_routing_key
         self.rabbitmq_up_exchange = rabbitmq_up_exchange
         self.rabbitmq_down_exchange = rabbitmq_down_exchange
-        self.rabbitmq_exchange_type = rabbitmq_exchange_type
+        self.rabbitmq_up_routing_key = rabbitmq_up_routing_key
+        self.rabbitmq_down_routing_key = rabbitmq_down_routing_key
+        self.rabbitmq_up_exchange_type = rabbitmq_up_exchange_type
+        self.rabbitmq_down_exchange_type = rabbitmq_down_exchange_type
 
     def get_host_id(self):
         return self.host_id
@@ -95,12 +98,6 @@ class UserData(BaseModel):
     def set_rabbitmq_down_queue(self, rabbitmq_down_queue):
         self.rabbitmq_down_queue = rabbitmq_down_queue
 
-    def get_rabbitmq_routing_key(self):
-        return self.rabbitmq_routing_key
-
-    def set_rabbitmq_routing_key(self, rabbitmq_routing_key):
-        self.rabbitmq_routing_key = rabbitmq_routing_key
-
     def get_rabbitmq_up_exchange(self):
         return self.rabbitmq_up_exchange
 
@@ -113,11 +110,29 @@ class UserData(BaseModel):
     def set_rabbitmq_down_exchange(self, rabbitmq_down_exchange):
         self.rabbitmq_down_exchange = rabbitmq_down_exchange
 
-    def get_rabbitmq_exchange_type(self):
-        return self.rabbitmq_exchange_type
+    def get_rabbitmq_up_routing_key(self):
+        return self.rabbitmq_up_routing_key
 
-    def set_rabbitmq_exchange_type(self, rabbitmq_exchange_type):
-        self.rabbitmq_exchange_type = rabbitmq_exchange_type
+    def set_rabbitmq_up_routing_key(self, rabbitmq_up_routing_key):
+        self.rabbitmq_up_routing_key = rabbitmq_up_routing_key
+
+    def get_rabbitmq_down_routing_key(self):
+        return self.rabbitmq_down_routing_key
+
+    def set_rabbitmq_down_routing_key(self, rabbitmq_down_routing_key):
+        self.rabbitmq_down_routing_key = rabbitmq_down_routing_key
+
+    def get_rabbitmq_up_exchange_type(self):
+        return self.rabbitmq_up_exchange_type
+
+    def set_rabbitmq_up_exchange_type(self, rabbitmq_up_exchange_type):
+        self.rabbitmq_up_exchange_type = rabbitmq_up_exchange_type
+
+    def get_rabbitmq_down_exchange_type(self):
+        return self.rabbitmq_down_exchange_type
+
+    def set_rabbitmq_down_exchange_type(self, rabbitmq_down_exchange_type):
+        self.rabbitmq_down_exchange_type = rabbitmq_down_exchange_type
 
     def to_dict(self):
         data = {
@@ -132,10 +147,12 @@ class UserData(BaseModel):
             'rabbitmq_auth_user': self.get_rabbitmq_auth_user(),
             'rabbitmq_auth_pass': self.get_rabbitmq_auth_pass(),
             'rabbitmq_down_queue': self.get_rabbitmq_down_queue(),
-            'rabbitmq_routing_key': self.get_rabbitmq_routing_key(),
             'rabbitmq_up_exchange': self.get_rabbitmq_up_exchange(),
             'rabbitmq_down_exchange': self.get_rabbitmq_down_exchange(),
-            'rabbitmq_exchange_type': self.get_rabbitmq_exchange_type()
+            'rabbitmq_up_routing_key': self.get_rabbitmq_up_routing_key(),
+            'rabbitmq_down_routing_key': self.get_rabbitmq_down_routing_key(),
+            'rabbitmq_up_exchange_type': self.get_rabbitmq_up_exchange_type(),
+            'rabbitmq_down_exchange_type': self.get_rabbitmq_down_exchange_type()
         }
 
         return data

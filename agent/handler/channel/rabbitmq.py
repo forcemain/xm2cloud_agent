@@ -25,8 +25,8 @@ class RabbitMQChannelSender(BaseChannelHelper, AMQPSender):
         self._cache_confirm = {}
         self._queue = self._userdata.get_rabbitmq_up_queue()
         self._exchange = self._userdata.get_rabbitmq_up_exchange()
-        self._routing_key = self._userdata.get_rabbitmq_routing_key()
-        self._exchange_type = self._userdata.get_rabbitmq_exchange_type()
+        self._routing_key = self._userdata.get_rabbitmq_up_routing_key()
+        self._exchange_type = self._userdata.get_rabbitmq_up_exchange_type()
 
     def events_filter(self, events):
         events_data = []
@@ -100,8 +100,8 @@ class RabbitMQChannelReceiver(BaseChannelHelper, AMQPReceiver):
 
         self._queue = self._userdata.get_rabbitmq_down_queue()
         self._exchange = self._userdata.get_rabbitmq_down_exchange()
-        self._routing_key = self._userdata.get_rabbitmq_routing_key()
-        self._exchange_type = self._userdata.get_rabbitmq_exchange_type()
+        self._routing_key = self._userdata.get_rabbitmq_down_routing_key()
+        self._exchange_type = self._userdata.get_rabbitmq_down_exchange_type()
 
     def connect(self):
         rabbitmq_host = self._userdata.get_rabbitmq_host()
