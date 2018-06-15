@@ -94,9 +94,7 @@ class AMQPReceiver(object):
 
     def setup_exchange(self, exchange_name):
         logger.info('Declaring exchange %s', exchange_name)
-        self._channel.exchange_declare(self.on_exchange_declareok,
-                                       exchange_name,
-                                       self._exchange_type, auto_delete=True)
+        self._channel.exchange_declare(self.on_exchange_declareok, exchange_name, self._exchange_type)
 
     def on_exchange_declareok(self, unused_frame):
         logger.info('Exchange declared')
