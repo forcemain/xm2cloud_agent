@@ -58,6 +58,7 @@ class ExecuteScriptEngineHandler(BaseEngineHandler):
                 p.terminate()
                 interrupt = True
                 return_code = 1312
+                break
             logger.debug('Event: {0}(timeout: {1}s) left {2} secomnds force exit'.format(
                 event_id, p_timeout, p_timeout - p_during
             ))
