@@ -3,6 +3,7 @@
 
 import os
 import time
+import fcntl
 import tempfile
 import subprocess
 
@@ -49,6 +50,10 @@ class ExecuteScriptEngineHandler(BaseEngineHandler):
         os.environ.update({'PYTHONIOENCODING': 'utf-8'})
         p = subprocess.Popen(command, shell=True, close_fds=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                              env=os.environ)
+        fd = p.stdout.fileno()
+        fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+        fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+
         interrupt = False
         p_running = time.time()
         p_timeout = int(script_obj.get_timeout())
@@ -62,7 +67,11 @@ class ExecuteScriptEngineHandler(BaseEngineHandler):
             logger.debug('Event: {0}(timeout: {1}s) left {2} secomnds force exit'.format(
                 event_id, p_timeout, p_timeout - p_during
             ))
-            line = p.stdout.readline()
+            try:
+                line = p.stdout.readline()
+            except IOError:
+                time.sleep(0.1)
+                continue
             if line == b'' and p.poll() is not None:
                 break
             self.info(event, line)
