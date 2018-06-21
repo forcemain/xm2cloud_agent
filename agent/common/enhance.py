@@ -151,20 +151,3 @@ class Random(object):
     @staticmethod
     def get_uuid():
         return uuid.uuid4().__str__()
-
-
-class Process(object):
-    def __init__(self, pid):
-        self.pid = pid
-
-    def kill_childs(self, sig=signal.SIGKILL):
-        try:
-            p = psutil.Process(self.pid)
-        except Exception:
-            return
-        childs = p.children(recursive=True)
-        for child in childs:
-            try:
-                os.kill(child, sig)
-            except Exception:
-                pass

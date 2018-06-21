@@ -4,12 +4,12 @@
 import os
 import time
 import fcntl
+import signal
 import tempfile
 import subprocess
 
 
 from agent.common.logger import Logger
-from agent.common.enhance import Process
 from agent.models.event.event_type import EventType
 from agent.models.event.user_script import UserScript
 from agent.handler.engine.baseengine import BaseEngineHandler
@@ -50,7 +50,7 @@ class ExecuteScriptEngineHandler(BaseEngineHandler):
         command = '{0} {1}'.format(script_obj.get_interpreter(), script_file.name)
         os.environ.update({'PYTHONIOENCODING': 'utf-8'})
         p = subprocess.Popen(command, shell=True, close_fds=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                             env=os.environ)
+                             preexec_fn=os.setsid, env=os.environ)
         fd = p.stdout.fileno()
         fl = fcntl.fcntl(fd, fcntl.F_GETFL)
         fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
@@ -61,8 +61,12 @@ class ExecuteScriptEngineHandler(BaseEngineHandler):
         while True:
             p_during = time.time() - p_running
             if p_during > p_timeout:
-                Process(p.pid).kill_childs()
                 p.terminate()
+                p.wait()
+                try:
+                    os.killpg(p.pid, signal.SIGTERM)
+                except OSError:
+                    pass
                 interrupt = True
                 return_code = 1312
                 break
