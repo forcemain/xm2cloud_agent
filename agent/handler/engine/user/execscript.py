@@ -9,6 +9,7 @@ import subprocess
 
 
 from agent.common.logger import Logger
+from agent.common.enhance import Process
 from agent.models.event.event_type import EventType
 from agent.models.event.user_script import UserScript
 from agent.handler.engine.baseengine import BaseEngineHandler
@@ -60,6 +61,7 @@ class ExecuteScriptEngineHandler(BaseEngineHandler):
         while True:
             p_during = time.time() - p_running
             if p_during > p_timeout:
+                Process(p.pid).kill_childs()
                 p.terminate()
                 interrupt = True
                 return_code = 1312
