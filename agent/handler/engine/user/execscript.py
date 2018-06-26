@@ -47,7 +47,7 @@ class ExecuteScriptEngineHandler(BaseEngineHandler):
 
         return_code = 1314
         script_file, script_obj = self.get_uscript(event)
-        command = '{0} {1}'.format(script_obj.get_interpreter(), script_file.name)
+        command = '{0} {1} 2>&1'.format(script_obj.get_interpreter(), script_file.name)
         os.environ.update({'PYTHONIOENCODING': 'utf-8'})
         p = subprocess.Popen(command, shell=True, close_fds=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                              preexec_fn=os.setsid, env=os.environ)
