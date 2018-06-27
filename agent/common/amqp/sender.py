@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-import json
-import pika
 import time
 
 
@@ -15,14 +13,10 @@ logger = Logger.get_logger(__name__)
 
 class AMQPSender(object):
     def __init__(self, **kwargs):
-        self._acked = 0
-        self._nacked = 0
         self._channel = None
-        self._deliveries = []
         self._closing = False
         self._stopping = False
         self._connection = None
-        self._message_number = 0
         self._queue = kwargs.get('queue', None)
         self._exchange = kwargs.get('exchange', None)
         self._routing_key = kwargs.get('routing_key')
@@ -74,11 +68,6 @@ class AMQPSender(object):
             self._connection.add_timeout(self._count_down, self.reconnect)
 
     def reconnect(self):
-        self._deliveries = []
-        self._acked = 0
-        self._nacked = 0
-        self._message_number = 0
-
         self._connection.ioloop.stop()
 
         self._connection = self.connect()
@@ -106,32 +95,7 @@ class AMQPSender(object):
 
     def start_publishing(self):
         logger.info('Issuing consumer related RPC commands')
-        self.enable_delivery_confirmations()
         self.schedule_next_message()
-
-    def enable_delivery_confirmations(self):
-        logger.info('Issuing Confirm.Select RPC command')
-        self._channel.confirm_delivery(self.on_delivery_confirmation)
-
-    def on_delivery_confirmation(self, method_frame):
-        confirmed = False
-
-        confirmation_type = method_frame.method.NAME.split('.')[1].lower()
-        logger.info('Received %s for delivery tag: %i',
-                    confirmation_type,
-                    method_frame.method.delivery_tag)
-        if confirmation_type == 'ack':
-            self._acked += 1
-            confirmed = True
-        elif confirmation_type == 'nack':
-            self._nacked += 1
-        self._deliveries.remove(method_frame.method.delivery_tag)
-        logger.info('Published %i messages, %i have yet to be confirmed, '
-                    '%i were acked and %i were nacked',
-                    self._message_number, len(self._deliveries),
-                    self._acked, self._nacked)
-
-        return confirmed
 
     def schedule_next_message(self):
         if self._stopping:

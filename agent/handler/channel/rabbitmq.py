@@ -22,8 +22,13 @@ class RabbitMQChannelSender(BaseChannelHelper, AMQPSender):
 
         self._userdata = self.userdata_dao.get_user_data()
 
-        self._cache_confirm = {}
+        self._ssl = self._userdata.get_rabbitmq_ssl()
+        self._host = self._userdata.get_rabbitmq_host()
+        self._port = self._userdata.get_rabbitmq_port()
+        self._vhost = self._userdata.get_rabbitmq_vhost()
         self._queue = self._userdata.get_rabbitmq_up_queue()
+        self._auth_user = self._userdata.get_rabbitmq_auth_user()
+        self._auth_pass = self._userdata.get_rabbitmq_auth_pass()
         self._exchange = self._userdata.get_rabbitmq_up_exchange()
         self._routing_key = self._userdata.get_rabbitmq_up_routing_key()
         self._exchange_type = self._userdata.get_rabbitmq_up_exchange_type()
@@ -43,26 +48,20 @@ class RabbitMQChannelSender(BaseChannelHelper, AMQPSender):
         return events_data
 
     def connect(self):
-        rabbitmq_host = self._userdata.get_rabbitmq_host()
-        rabbitmq_port = self._userdata.get_rabbitmq_port()
-
         conn_parameters = pika.ConnectionParameters(
             retry_delay=5,
+            ssl=self._ssl,
+            host=self._host,
+            port=self._port,
             channel_max=1000,
             socket_timeout=15,
-            host=rabbitmq_host,
-            port=rabbitmq_port,
             heartbeat_interval=10,
             connection_attempts=5,
-            ssl=self._userdata.get_rabbitmq_ssl(),
-            credentials=pika.PlainCredentials(
-                self._userdata.get_rabbitmq_auth_user(),
-                self._userdata.get_rabbitmq_auth_pass()
-            ),
-            virtual_host=self._userdata.get_rabbitmq_vhost(),
+            virtual_host=self._vhost,
+            credentials=pika.PlainCredentials(self._auth_user, self._auth_pass)
         )
 
-        logger.info('Connecting to {0}:{1}'.format(rabbitmq_host, rabbitmq_port))
+        logger.info('Connecting to {0}:{1}'.format(self._host, self._port))
         return pika.SelectConnection(conn_parameters,
                                      self.on_connection_open,
                                      stop_ioloop_on_close=True)
@@ -71,24 +70,14 @@ class RabbitMQChannelSender(BaseChannelHelper, AMQPSender):
         if self._stopping:
             return
         # default batch 50, can be set larger
-        events_data = self.wcache_handler.read()
+        events_data = self.wcache_handler.read(batch=settings.CHANNEL_SENDER_EVENT_BATCH_SIZE)
         events_data_filtered = self.events_filter(events_data)
         for fname, fcontent in events_data_filtered:
             # may be usefull
             # fpath = os.path.join(self.wcache_handler.cache_path, fname)
             self._channel.basic_publish(self._exchange, self._routing_key, fcontent, properties={})
-            self._message_number += 1
-            self._cache_confirm.update({self._message_number: fname})
-            self._deliveries.append(self._message_number)
-            logger.info('Published message # %i', self._message_number)
+            self.wcache_handler.remove(fname)
         self.schedule_next_message()
-
-    def on_delivery_confirmation(self, method_frame):
-        confirmed = super(RabbitMQChannelSender, self).on_delivery_confirmation(method_frame)
-        if confirmed is False:
-            return
-        fname = self._cache_confirm.pop(method_frame.method.delivery_tag, '')
-        self.wcache_handler.remove(fname)
 
 
 class RabbitMQChannelReceiver(BaseChannelHelper, AMQPReceiver):
@@ -98,32 +87,32 @@ class RabbitMQChannelReceiver(BaseChannelHelper, AMQPReceiver):
 
         self._userdata = self.userdata_dao.get_user_data()
 
+        self._ssl = self._userdata.get_rabbitmq_ssl()
+        self._host = self._userdata.get_rabbitmq_host()
+        self._port = self._userdata.get_rabbitmq_port()
+        self._vhost = self._userdata.get_rabbitmq_vhost()
         self._queue = self._userdata.get_rabbitmq_down_queue()
+        self._auth_user = self._userdata.get_rabbitmq_auth_user()
+        self._auth_pass = self._userdata.get_rabbitmq_auth_pass()
         self._exchange = self._userdata.get_rabbitmq_down_exchange()
         self._routing_key = self._userdata.get_rabbitmq_down_routing_key()
         self._exchange_type = self._userdata.get_rabbitmq_down_exchange_type()
 
     def connect(self):
-        rabbitmq_host = self._userdata.get_rabbitmq_host()
-        rabbitmq_port = self._userdata.get_rabbitmq_port()
-
         conn_parameters = pika.ConnectionParameters(
             retry_delay=5,
+            ssl=self._ssl,
+            host=self._host,
+            port=self._port,
             channel_max=1000,
             socket_timeout=15,
-            host=rabbitmq_host,
-            port=rabbitmq_port,
             heartbeat_interval=10,
             connection_attempts=5,
-            ssl=self._userdata.get_rabbitmq_ssl(),
-            credentials=pika.PlainCredentials(
-                self._userdata.get_rabbitmq_auth_user(),
-                self._userdata.get_rabbitmq_auth_pass()
-            ),
-            virtual_host=self._userdata.get_rabbitmq_vhost(),
+            virtual_host=self._vhost,
+            credentials=pika.PlainCredentials(self._auth_user, self._auth_pass)
         )
 
-        logger.info('Connecting to {0}:{1}'.format(rabbitmq_host, rabbitmq_port))
+        logger.info('Connecting to {0}:{1}'.format(self._host, self._port))
         return pika.SelectConnection(conn_parameters,
                                      self.on_connection_open,
                                      stop_ioloop_on_close=True)
@@ -133,7 +122,6 @@ class RabbitMQChannelReceiver(BaseChannelHelper, AMQPReceiver):
                     basic_deliver.delivery_tag, properties.app_id, body)
         # put it to local cache
         self.rcache_handler.write(body)
-        self.acknowledge_message(basic_deliver.delivery_tag)
 
 
 class RabbitMQChannelHandler(BaseChannelHelper, BaseChannelHandler):
