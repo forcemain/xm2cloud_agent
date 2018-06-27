@@ -92,7 +92,8 @@ class AMQPSender(object):
         logger.info('Channel opened')
         self._channel = channel
         self.add_on_channel_close_callback()
-        self.setup_exchange(self._exchange)
+        # enable delivery ack and start publish
+        self.start_publishing()
 
     def add_on_channel_close_callback(self):
         logger.info('Adding channel close callback')
@@ -102,29 +103,6 @@ class AMQPSender(object):
         logger.warning('Channel was closed: (%s) %s', reply_code, reply_text)
         if not self._closing:
             self._connection.close()
-
-    def setup_exchange(self, exchange_name):
-        logger.info('Declaring exchange %s', exchange_name)
-        self._channel.exchange_declare(self.on_exchange_declareok, exchange_name, self._exchange_type)
-
-    def on_exchange_declareok(self, unused_frame):
-        logger.info('Exchange declared')
-        self.setup_queue(self._queue)
-
-    def setup_queue(self, queue_name):
-        logger.info('Declaring queue %s', queue_name)
-        self._channel.queue_declare(self.on_queue_declareok, queue_name, auto_delete=True)
-
-    def on_queue_declareok(self, method_frame):
-        logger.info('Binding %s to %s with %s',
-                    self._exchange, self._queue, self._routing_key)
-        self._channel.queue_bind(self.on_bindok, self._queue,
-                                 self._exchange, self._routing_key)
-
-    def on_bindok(self, unused_frame):
-        logger.info('Queue bound')
-        # enable delivery ack and start publish
-        self.start_publishing()
 
     def start_publishing(self):
         logger.info('Issuing consumer related RPC commands')
