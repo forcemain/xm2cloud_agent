@@ -107,8 +107,6 @@ class Engine(Process):
         return events_data
 
     def require_handle(self, event):
-        is_require = False
-
         # get source from userdata event
         host_id = self._userdata.get_host_id()
         cluster_id = self._userdata.get_cluster_id()
@@ -121,17 +119,17 @@ class Engine(Process):
 
         # is it my task ?
         if isinstance(target_host_id, list) and host_id in target_host_id:
-            is_require = True
+            return True
         if isinstance(target_hostgroup_id, list) and isinstance(hostgroup_id, list) and (
             set(target_hostgroup_id) & set(hostgroup_id)
         ):
-            is_require = True
+            return True
         if isinstance(target_cluster_id, list) and isinstance(cluster_id, list) and (
             set(target_cluster_id) & set(cluster_id)
         ):
-            is_require = True
+            return True
 
-        return is_require
+        return False
 
     def allow_dispatch(self, event):
         is_allow = True
