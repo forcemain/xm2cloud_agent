@@ -19,6 +19,8 @@ class BaseChannelHelper(object):
         self._rcache_handler = None
         self._wcache_handler = None
         self._ccache_handler = None
+        self._ucache_handler = None
+        self._ucache_path = kwargs.get('ucache_path', None)
         self._ccache_path = kwargs.get('ccache_path', None)
         self._rcache_path = kwargs.get('rcache_path', None)
         self._wcache_path = kwargs.get('wcache_path', None)
@@ -52,6 +54,15 @@ class BaseChannelHelper(object):
         return self._wcache_path
 
     @property
+    def ucache_path(self):
+        if self._ucache_path and os.path.exists(self._ucache_path):
+            return self._ucache_path
+        basedir = database.get_basedir()
+        self._ucache_path = os.path.join(basedir, 'cache', 'channel', 'ucache')
+
+        return self._ucache_path
+
+    @property
     def ccache_handler(self):
         if isinstance(self._ccache_handler, CacheHandler):
             return self._ccache_handler
@@ -74,6 +85,14 @@ class BaseChannelHelper(object):
         self._wcache_handler = CacheHandler(cache_path=self.wcache_path)
 
         return self._wcache_handler
+
+    @property
+    def ucache_handler(self):
+        if isinstance(self._ucache_handler, CacheHandler):
+            return self._ucache_handler
+        self._ucache_handler = CacheHandler(cache_path=self.ucache_path)
+
+        return self._ucache_handler
 
     @property
     def userdata_dao(self):

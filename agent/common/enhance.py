@@ -4,8 +4,6 @@
 import re
 import os
 import uuid
-import psutil
-import signal
 import shutil
 import hashlib
 import chardet
@@ -69,11 +67,28 @@ class File(object):
     def force_move(spath, dpath):
         if not os.path.exists(spath):
             return
-
         basedir = os.path.dirname(dpath)
         if not os.path.exists(basedir):
             os.makedirs(basedir)
         shutil.move(spath, dpath)
+
+    @staticmethod
+    def force_copy(spath, dpath):
+        if not os.path.exists(spath):
+            return
+        basedir = os.path.dirname(dpath)
+        if not os.path.exists(basedir):
+            os.makedirs(basedir)
+        shutil.copy(spath, dpath)
+
+    @staticmethod
+    def force_delete(spath):
+        if not os.path.exists(spath):
+            return
+        if os.path.isdir(spath):
+            shutil.rmtree(spath, ignore_errors=True)
+            return
+        os.remove(spath)
 
     @staticmethod
     def get_str_md5(data):

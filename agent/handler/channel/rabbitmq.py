@@ -2,12 +2,12 @@
 
 
 import pika
-import time
 
 
 from agent import settings
 from agent.common.logger import Logger
 from agent.common.amqp.sender import AMQPSender
+from agent.models.event.pub_event import PubEvent
 from agent.common.amqp.receiver import AMQPReceiver
 from agent.handler.channel import BaseChannelHelper, BaseChannelHandler
 
@@ -33,20 +33,6 @@ class RabbitMQChannelSender(BaseChannelHelper, AMQPSender):
         self._routing_key = self._userdata.get_rabbitmq_up_routing_key()
         self._exchange_type = self._userdata.get_rabbitmq_up_exchange_type()
 
-    def events_filter(self, events):
-        events_data = []
-        # may be you want filter out event that half an hour ago
-        for event_data in events:
-            fname, fcontent = event_data
-            mtimedelta = time.time() - self.wcache_handler.mtime(fname)
-            if mtimedelta < settings.CHANNEL_SENDER_EVENT_EXPIRED_TIME:
-                events_data.append(event_data)
-                continue
-            logger.warning('Expired event file %s, deleted', fname)
-            self.wcache_handler.remove(fname)
-
-        return events_data
-
     def connect(self):
         conn_parameters = pika.ConnectionParameters(
             retry_delay=5,
@@ -66,17 +52,23 @@ class RabbitMQChannelSender(BaseChannelHelper, AMQPSender):
                                      self.on_connection_open,
                                      stop_ioloop_on_close=True)
 
+    def allow_send(self, fcontent):
+        event = PubEvent.from_json(fcontent)
+
+        return event.is_valid()
+
     def publish_message(self):
         if self._stopping:
             return
         # default batch 50, can be set larger
         events_data = self.wcache_handler.read(batch=settings.CHANNEL_SENDER_EVENT_BATCH_SIZE)
-        events_data_filtered = self.events_filter(events_data)
-        for fname, fcontent in events_data_filtered:
-            # may be usefull
+        for fname, fcontent in events_data:
+            self.wcache_handler.remove(fname)
+            if not self.allow_send(fcontent):
+                logger.warning('Not allowed send this event data: {0}'.format(fcontent))
+                continue
             # fpath = os.path.join(self.wcache_handler.cache_path, fname)
             self._channel.basic_publish(self._exchange, self._routing_key, fcontent, properties={})
-            self.wcache_handler.remove(fname)
         self.schedule_next_message()
 
 
@@ -117,9 +109,38 @@ class RabbitMQChannelReceiver(BaseChannelHelper, AMQPReceiver):
                                      self.on_connection_open,
                                      stop_ioloop_on_close=True)
 
+    def allow_receive(self, fcontent):
+        # get source from userdata event
+        host_id = self._userdata.get_host_id()
+        cluster_id = self._userdata.get_cluster_id()
+        hostgroup_id = self._userdata.get_hostgroup_id()
+
+        # get target_... from server event
+        event = PubEvent.from_json(fcontent)
+        target_host_id = event.get_target_host_id()
+        target_cluster_id = event.get_target_cluster_id()
+        target_hostgroup_id = event.get_target_hostgroup_id()
+
+        # is it my task ?
+        if isinstance(target_host_id, list) and host_id in target_host_id:
+            return True
+        if isinstance(target_hostgroup_id, list) and isinstance(hostgroup_id, list) and (
+            set(target_hostgroup_id) & set(hostgroup_id)
+        ):
+            return True
+        if isinstance(target_cluster_id, list) and isinstance(cluster_id, list) and (
+            set(target_cluster_id) & set(cluster_id)
+        ):
+            return True
+
+        return False
+
     def on_message(self, unused_channel, basic_deliver, properties, body):
         logger.info('Received message # %s from %s: %s',
                     basic_deliver.delivery_tag, properties.app_id, body)
+        if not self.allow_receive(body):
+            logger.warning('Not allowed receive this event data: {0}'.format(body))
+            return
         # put it to local cache
         self.rcache_handler.write(body)
 

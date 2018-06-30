@@ -39,14 +39,7 @@ class EventThread(Thread):
             _evnet_threads.remove(self)
         self._obj.channel_handler.ccache_handler.remove(self._fname)
 
-    def before_run(self):
-        source_file = self._obj.channel_handler.rcache_handler.abspath(self._fname)
-        target_file = self._obj.channel_handler.ccache_handler.abspath(self._fname)
-
-        File.force_move(source_file, target_file)
-
     def run(self):
-        self.before_run()
         try:
             event = PubEvent.from_json(self._fcontent)
             self._obj.event_dispatch(event)
@@ -97,54 +90,27 @@ class Engine(Process):
 
         return next_time_str
 
+    def put_ccache(self, fname):
+        source_file = self.channel_handler.rcache_handler.abspath(fname)
+        target_file = self.channel_handler.ccache_handler.abspath(fname)
+
+        File.force_move(source_file, target_file)
+
     def run_destructor(self):
         self.channel_handler.ccache_handler.clear()
 
     def event_get(self):
         # default batch is 50, can be set larger
-        events_data = self.channel_handler.rcache_handler.read()
+        events_data = self.channel_handler.rcache_handler.read(batch=settings.ENGINE_EVENT_BATCH_SIZE)
 
         return events_data
-
-    def require_handle(self, event):
-        # get source from userdata event
-        host_id = self._userdata.get_host_id()
-        cluster_id = self._userdata.get_cluster_id()
-        hostgroup_id = self._userdata.get_hostgroup_id()
-
-        # get target_... from server event
-        target_host_id = event.get_target_host_id()
-        target_cluster_id = event.get_target_cluster_id()
-        target_hostgroup_id = event.get_target_hostgroup_id()
-
-        # is it my task ?
-        if isinstance(target_host_id, list) and host_id in target_host_id:
-            return True
-        if isinstance(target_hostgroup_id, list) and isinstance(hostgroup_id, list) and (
-            set(target_hostgroup_id) & set(hostgroup_id)
-        ):
-            return True
-        if isinstance(target_cluster_id, list) and isinstance(cluster_id, list) and (
-            set(target_cluster_id) & set(cluster_id)
-        ):
-            return True
-
-        return False
 
     def allow_dispatch(self, event):
         is_allow = True
 
-        if not self.require_handle(event):
-            is_allow = False
-            logger.warning('Not own engien event data: {0}'.format(event))
-        if event.is_adjunct():
-            is_allow = False
-            # self.event_response(event, retcode=0)
-            logger.warning('Adjunct engine event data: {0}'.format(event))
         if not event.is_valid():
             is_allow = False
             logger.warning('Invalid engine event data: {0}'.format(event))
-        # default expired 180s
         if event.is_expired():
             is_allow = False
             logger.warning('Expired engine event data: {0}'.format(event))
@@ -213,10 +179,12 @@ class Engine(Process):
                     time.sleep(settings.ENGINE_SCHEDULER_INTERVAL)
                     continue
                 for event_data in events_data:
+                    fname, _ = event_data
+                    self.put_ccache(fname)
                     t = EventThread(event_data, self)
+                    _evnet_threads.append(t)
                     t.setDaemon(True)
                     t.start()
-                    _evnet_threads.append(t)
                     # may be an  time-consuming task, so not join
                 logger.info('Events ready, next scheduled at %s', self.next_scheduled)
                 time.sleep(settings.ENGINE_SCHEDULER_INTERVAL)
