@@ -2,7 +2,7 @@
 
 
 import os
-
+import glob
 
 from agent import settings
 from agent.common.enhance import File
@@ -19,11 +19,10 @@ class UpdateUserDataEngineHandler(BaseEngineHandler):
     name = EventType.UPDATEUSERDATA
 
     def del_user_data(self):
-        data_files = os.listdir(self.channel_handler.ucache_path)
+        data_files = glob.glob(os.path.join(self.channel_handler.ucache_path, '*.json'))
         if len(data_files) < 5:
             return
-        for f_name in sorted(data_files, reverse=True)[5:]:
-            f_path = os.path.join(self.channel_handler.ucache_path, f_name)
+        for f_path in sorted(data_files, reverse=True)[5:]:
             File.force_delete(f_path)
 
     def set_user_data(self, event):
@@ -44,13 +43,12 @@ class UpdateUserDataEngineHandler(BaseEngineHandler):
 
         self.del_user_data()
 
-        data_files = os.listdir(self.channel_handler.ucache_path)
+        data_files = glob.glob(os.path.join(self.channel_handler.ucache_path, '*.json'))
         sort_files = sorted(data_files, reverse=True)
         if not sort_files:
             return_code = 1313
             return return_code
-        sfile_path = os.path.join(self.channel_handler.ucache_path, sort_files[0])
-        File.force_copy(sfile_path, ufile_path)
+        File.force_copy(sort_files[0], udata_path)
 
         return return_code
 
