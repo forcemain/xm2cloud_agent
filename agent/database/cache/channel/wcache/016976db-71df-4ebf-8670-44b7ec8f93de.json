@@ -1,0 +1,21 @@
+{
+    "target_host_id": null, 
+    "handled_event_host_id": null, 
+    "event_source": "xm2cloud_agent", 
+    "target_hostgroup_id": null, 
+    "source_cluster_id": [], 
+    "event_id": null, 
+    "encryption": null, 
+    "response_code": null, 
+    "source_host_id": "", 
+    "target_cluster_id": null, 
+    "event_name": "monitoring", 
+    "source_hostgroup_id": [], 
+    "handled_event_cluster_id": null, 
+    "event_timestamp": 1530349917.976099, 
+    "source_version": "0.0.1", 
+    "handled_event_hostgroup_id": null, 
+    "event_uuid": "16d6b797-d8e5-4756-b02b-26124e90f98d", 
+    "event_data": "{\n    \"name\": \"mem.swapused\", \n    \"value\": 1023934464, \n    \"tags\": {}\n}", 
+    "handled_event_id": null
+}

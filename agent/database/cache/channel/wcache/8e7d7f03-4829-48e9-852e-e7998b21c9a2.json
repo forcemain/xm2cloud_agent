@@ -1,0 +1,21 @@
+{
+    "target_host_id": null, 
+    "handled_event_host_id": null, 
+    "event_source": "xm2cloud_agent", 
+    "target_hostgroup_id": null, 
+    "source_cluster_id": [], 
+    "event_id": null, 
+    "encryption": null, 
+    "response_code": null, 
+    "source_host_id": "", 
+    "target_cluster_id": null, 
+    "event_name": "monitoring", 
+    "source_hostgroup_id": [], 
+    "handled_event_cluster_id": null, 
+    "event_timestamp": 1530349917.981692, 
+    "source_version": "0.0.1", 
+    "handled_event_hostgroup_id": null, 
+    "event_uuid": "e5a2954e-0659-48bf-9729-1b2d6c800622", 
+    "event_data": "{\n    \"name\": \"mem.memused.percentage\", \n    \"value\": 72.7, \n    \"tags\": {}\n}", 
+    "handled_event_id": null
+}

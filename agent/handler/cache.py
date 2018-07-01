@@ -96,11 +96,15 @@ class CacheHandler(object):
 
     def write(self, data, cache_path=None, suffix='json'):
         path = self.get_realpath(cache_path)
-        name = '{0}.{1}'.format(Random.get_uuid(), suffix)
+        uuid = Random.get_uuid()
+        name = '{0}.{1}'.format(uuid, suffix)
+        temp = '{0}.{1}'.format(uuid, 'temp')
 
         file_path = os.path.join(path, name)
+        temp_path = os.path.join(path, temp)
 
-        File.write_content(data, file_path)
+        File.write_content(data, temp_path)
+        File.force_move(temp_path, file_path)
 
     def abspath(self, name, cache_path=None):
         _, file_path = self.exists(name, cache_path=cache_path)

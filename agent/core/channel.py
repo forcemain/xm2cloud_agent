@@ -99,11 +99,19 @@ class Channel(Process):
 
     def run(self):
         # start sender and receiver thread
-        self.sender_thread().start()
-        self.receiver_thread().start()
+        wthread = self.sender_thread()
+        wthread.start()
+        rthread = self.receiver_thread()
+        rthread.start()
         try:
             while not self._gsignal.is_set():
                 self.channel_checking()
+                if not wthread.isAlive():
+                    wthread = self.sender_thread()
+                    wthread.start()
+                if not rthread.isAlive():
+                    rthread = self.receiver_thread()
+                    rthread.start()
                 logger.info('Events ready, next scheduled at %s', self.next_scheduled)
                 time.sleep(settings.CHANNEL_SCHEDULER_INTERVAL)
             print 'Channel process({0}) exit.'.format(os.getpid())
