@@ -17,11 +17,7 @@ class AMQPSender(object):
         self._closing = False
         self._stopping = False
         self._connection = None
-        self._queue = kwargs.get('queue', None)
-        self._exchange = kwargs.get('exchange', None)
-        self._routing_key = kwargs.get('routing_key')
         self._count_down = kwargs.get('count_down', 5)
-        self._exchange_type = kwargs.get('exchange_type')
         self._publish_interval = kwargs.get('publish_interval', 1)
 
         # get a millisecond timestamp

@@ -26,12 +26,10 @@ class RabbitMQChannelSender(BaseChannelHelper, AMQPSender):
         self._host = self._userdata.get_rabbitmq_host()
         self._port = self._userdata.get_rabbitmq_port()
         self._vhost = self._userdata.get_rabbitmq_vhost()
-        self._queue = self._userdata.get_rabbitmq_up_queue()
         self._auth_user = self._userdata.get_rabbitmq_auth_user()
         self._auth_pass = self._userdata.get_rabbitmq_auth_pass()
         self._exchange = self._userdata.get_rabbitmq_up_exchange()
         self._routing_key = self._userdata.get_rabbitmq_up_routing_key()
-        self._exchange_type = self._userdata.get_rabbitmq_up_exchange_type()
 
     def connect(self):
         conn_parameters = pika.ConnectionParameters(
@@ -83,7 +81,7 @@ class RabbitMQChannelReceiver(BaseChannelHelper, AMQPReceiver):
         self._host = self._userdata.get_rabbitmq_host()
         self._port = self._userdata.get_rabbitmq_port()
         self._vhost = self._userdata.get_rabbitmq_vhost()
-        self._queue = self._userdata.get_rabbitmq_down_queue()
+        # self._queue = self._userdata.get_rabbitmq_down_queue()
         self._auth_user = self._userdata.get_rabbitmq_auth_user()
         self._auth_pass = self._userdata.get_rabbitmq_auth_pass()
         self._exchange = self._userdata.get_rabbitmq_down_exchange()
