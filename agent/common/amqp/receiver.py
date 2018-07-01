@@ -18,7 +18,6 @@ class AMQPReceiver(object):
         self._connection = None
         self._temp_queue = None
         self._consumer_tag = None
-        self._queue = kwargs.get('queue', None)
         self._exchange = kwargs.get('exchange', None)
         self._count_down = kwargs.get('count_down', 5)
         self._routing_key = kwargs.get('routing_key', None)
@@ -98,7 +97,8 @@ class AMQPReceiver(object):
 
     def on_exchange_declareok(self, unused_frame):
         logger.info('Exchange declared')
-        self.setup_queue(self._queue)
+        # for exclusive mode
+        self.setup_queue('')
 
     def setup_queue(self, queue_name):
         logger.info('Declaring queue %s', queue_name)

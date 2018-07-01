@@ -81,7 +81,6 @@ class RabbitMQChannelReceiver(BaseChannelHelper, AMQPReceiver):
         self._host = self._userdata.get_rabbitmq_host()
         self._port = self._userdata.get_rabbitmq_port()
         self._vhost = self._userdata.get_rabbitmq_vhost()
-        # self._queue = self._userdata.get_rabbitmq_down_queue()
         self._auth_user = self._userdata.get_rabbitmq_auth_user()
         self._auth_pass = self._userdata.get_rabbitmq_auth_pass()
         self._exchange = self._userdata.get_rabbitmq_down_exchange()
