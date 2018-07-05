@@ -9,6 +9,17 @@ import hashlib
 import chardet
 
 
+class Pipe(object):
+    def __init__(self, func):
+        self.func = func
+
+    def __ror__(self, other):
+        return self.func(other)
+
+    def __call__(self, *args, **kwargs):
+        return Pipe(lambda x: self.func(x, *args, **kwargs))
+
+
 class ExtStr(str):
     def __init__(self, *args, **kwargs):
         super(ExtStr, self).__init__()

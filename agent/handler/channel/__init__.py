@@ -20,6 +20,8 @@ class BaseChannelHelper(object):
         self._wcache_handler = None
         self._ccache_handler = None
         self._ucache_handler = None
+        self._dcache_handler = None
+        self._dcache_path = kwargs.get('dcache_path', None)
         self._ucache_path = kwargs.get('ucache_path', None)
         self._ccache_path = kwargs.get('ccache_path', None)
         self._rcache_path = kwargs.get('rcache_path', None)
@@ -63,6 +65,15 @@ class BaseChannelHelper(object):
         return self._ucache_path
 
     @property
+    def dcache_path(self):
+        if self._dcache_path and os.path.exists(self._dcache_path):
+            return self._dcache_path
+        basedir = database.get_basedir()
+        self._dcache_path = os.path.join(basedir, 'cache', 'channel', 'dcache')
+
+        return self._dcache_path
+
+    @property
     def ccache_handler(self):
         if isinstance(self._ccache_handler, CacheHandler):
             return self._ccache_handler
@@ -91,6 +102,14 @@ class BaseChannelHelper(object):
         if isinstance(self._ucache_handler, CacheHandler):
             return self._ucache_handler
         self._ucache_handler = CacheHandler(cache_path=self.ucache_path)
+
+        return self._ucache_handler
+
+    @property
+    def dcache_handler(self):
+        if isinstance(self._dcache_handler, CacheHandler):
+            return self._dcache_handler
+        self._dcache_handler = CacheHandler(cache_path=self.dcache_path)
 
         return self._ucache_handler
 
