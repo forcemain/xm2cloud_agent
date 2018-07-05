@@ -11,8 +11,8 @@ class PubAppSpec(BaseModel):
     def __init__(self, version=None, os=None, files=None, hooks=None):
         self.version = version
         self.os = os
-        self.files = files
-        self.hooks = hooks
+        self.files = files or []
+        self.hooks = hooks or []
 
     def get_version(self):
         return self.version

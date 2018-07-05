@@ -140,6 +140,34 @@ class CodeDeployHandler(BaseDeployHandler):
     def _application_install(self, return_code, event, workspace):
         hook_name = 'application_install'
 
+        files = self.appspec.get_files()
+        for file_map in files:
+            if 'source' not in file_map or 'destination' not in file_map:
+                _message = 'Invalid file map, (source, destination) required'
+                self.engine.error(self.pevent, _message)
+                return_code = 1313
+                break
+            source, destination = file_map['source'], file_map['destination']
+            target = destination
+            if (destination.endswith('.war') or
+                    destination.endswith('.jar') or
+                    destination.endswith('.so') or
+                    destination.endswith('.zip')):
+                target = os.path.dirname(destination)
+            if not os.path.exists(target):
+                os.makedirs(target)
+            if not source.startswith('/'):
+                source = os.path.join(workspace, source)
+            else:
+                source = '{0}{1}'.format(workspace, source)
+            _message = 'Copy {0} to {1}'.format(source, destination)
+            self.engine.info(self.pevent, _message)
+
+            if os.path.isdir(source):
+                shutil.copytree(source, destination)
+            else:
+                shutil.copy(source, destination)
+
         return self._hook_dispatch(hook_name, return_code, event, workspace)
 
     def _after_install(self, return_code, event, workspace):
