@@ -148,14 +148,11 @@ class CodeDeployHandler(BaseDeployHandler):
                 return_code = 1313
                 break
             source, destination = file_map['source'], file_map['destination']
-            target = destination
             if (destination.endswith('.war') or
                     destination.endswith('.jar') or
                     destination.endswith('.so') or
                     destination.endswith('.zip')):
-                target = os.path.dirname(destination)
-            if not os.path.exists(target):
-                os.makedirs(target)
+                destination = os.path.dirname(destination)
             if not source.startswith('/'):
                 source = os.path.join(workspace, source)
             else:
