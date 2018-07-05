@@ -3,6 +3,7 @@
 
 import os
 import urllib
+import shutil
 
 
 from agent.common.enhance import Pipe
@@ -34,11 +35,10 @@ class CodeDeployHandler(BaseDeployHandler):
     
     def validate_appspec(self, dpath):
         appspec_path = os.path.join(dpath, 'appspec.json')
-        appspec = PubAppSpec.from_json(appspec_path)
+        with open(appspec_path, 'r+b') as fd:
+            self.appspec = PubAppSpec.from_json(fd.read())
 
-        self.appspec = appspec
-
-        return appspec.is_valid()
+        return self.appspec.is_valid()
 
     def get_unzip_path(self, event, frelease):
         app_id = event.get_app_id()
@@ -88,7 +88,7 @@ class CodeDeployHandler(BaseDeployHandler):
                 self.engine.info(self.pevent, _message)
 
                 spath, dpath = filepath, self.get_unzip_path(event, frelease)
-                _message = 'Start unzip {0} to {1}'.format(filepath, spath, dpath)
+                _message = 'Start unzip {0} to {1}'.format(spath, dpath)
                 self.engine.info(self.pevent, _message)
                 self.force_unzip(spath, dpath)
                 _message = 'Start validate required appspec.json from {0}'.format(dpath)
@@ -102,6 +102,17 @@ class CodeDeployHandler(BaseDeployHandler):
                     _message = 'Validate appspec.json from {0} failed'.format(dpath)
                     self.engine.error(self.pevent, _message)
                     workspace = workspace
+
+                # reverse 3 backup release
+                base_path = os.path.dirname(dpath)
+                releases = sorted(os.listdir(base_path), reverse=True)
+                for release in releases[3:]:
+                    abs_path = os.path.join(base_path, release)
+                    shutil.rmtree(abs_path)
+                    zip_path = os.path.join(self.engine.channel_handler.dcache_path, '{0}.zip'.format(release))
+                    if not os.path.exists(zip_path):
+                        continue
+                    os.remove(zip_path)
             else:
                 _message = 'Download to {0} failed, filesize: {1}'.format(filepath, filesize)
                 self.engine.error(self.pevent, _message)

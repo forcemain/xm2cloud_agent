@@ -39,7 +39,7 @@ class BaseDeployHandler(object):
         if return_code != 1314:
             return return_code
 
-        hooks = event.get_hooks()
+        hooks = self.appspec.get_hooks()
         if hook_name not in hooks or len(hooks[hook_name]) == 0:
             return_code = 1314
             _message = 'Not found {0} hook scripts, skipped'.format(hook_name)
@@ -47,7 +47,7 @@ class BaseDeployHandler(object):
             return return_code
 
         _scripts = hooks[hook_name]
-        _message = 'Load {0} hook scripts ... '.format(hook_name)
+        _message = 'Start Load {0} hook scripts'.format(hook_name)
         self.engine.info(self.pevent, _message)
         for script in _scripts:
             if 'timeout' not in script or 'location' not in script:
@@ -101,6 +101,12 @@ class BaseDeployHandler(object):
 
             if return_code != 1314:
                 break
+
+        _message = 'Finish exec {0} hook scripts, return_code: {1}'.format(hook_name, return_code)
+        if return_code != 1314:
+            self.engine.error(self.pevent, _message)
+        else:
+            self.engine.info(self.pevent, _message)
 
         return return_code
 
