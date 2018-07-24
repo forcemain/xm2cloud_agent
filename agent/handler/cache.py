@@ -3,8 +3,8 @@
 
 import os
 import glob
+import time
 import shutil
-import itertools
 
 
 from agent.common.logger import Logger
@@ -76,14 +76,14 @@ class CacheHandler(object):
             except OSError:
                 pass
 
-    def read(self, cache_path=None, batch=50, suffix='json'):
+    def read(self, cache_path=None, batch=512, suffix='json'):
         event_data = []
 
         path = self.get_realpath(cache_path)
         name = os.path.join(path, '*.{0}'.format(suffix))
 
-        glob_files = glob.glob(name)
-        for f in itertools.islice(glob_files, 0, batch):
+        count = 0
+        for f in glob.iglob(name):
             f_name = os.path.basename(f)
             try:
                 f_content = File.read_content(f)
@@ -91,14 +91,18 @@ class CacheHandler(object):
                 logger.warning('Read {0} {1}'.format(f, e))
                 continue
             event_data.append((f_name, f_content))
+            count += 1
+            if count >= batch:
+                break
 
-        return event_data
+        return sorted(event_data)
 
     def write(self, data, cache_path=None, suffix='json'):
         path = self.get_realpath(cache_path)
-        uuid = Random.get_uuid()
-        name = '{0}.{1}'.format(uuid, suffix)
-        temp = '{0}.{1}'.format(uuid, 'temp')
+        uuid, timestamp = Random.get_uuid(), time.time()
+
+        name = '{0}_{1}.{2}'.format(timestamp, uuid, suffix)
+        temp = '{0}.{1}'.format(name, 'temp')
 
         file_path = os.path.join(path, name)
         temp_path = os.path.join(path, temp)

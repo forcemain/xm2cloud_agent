@@ -89,21 +89,28 @@ class Collector(BaseCollector):
             if case():
                 return None
 
-    def get_net_counts(self, sample_duration=1):
-        net_io = psutil.net_io_counters(pernic=False)
-        net_if_in_bytes_persec_list = [net_io.bytes_recv]
-        net_if_out_bytes_persec_list = [net_io.bytes_sent]
-        net_if_in_packets_persec_list = [net_io.packets_recv]
+    def get_net_counts(self, name, sample_duration=1):
+        net_io_map = {}
+        net_io = psutil.net_io_counters(pernic=True)
+        for iface, iinfo in net_io.iteritems():
+            net_io_map[iface] = {
+                'errout': iinfo.errout,
+                'net_if_in_bytes_persec': [iinfo.bytes_recv],
+                'net_if_out_bytes_persec': [iinfo.bytes_sent],
+                'net_if_in_packets_persec': [iinfo.packets_recv]
+            }
         time.sleep(sample_duration)
-        net_io = psutil.net_io_counters(pernic=False)
-        net_if_in_bytes_persec_list.insert(0, net_io.bytes_recv)
-        net_if_out_bytes_persec_list.insert(0, net_io.bytes_sent)
-        net_if_in_packets_persec_list.insert(0, net_io.packets_recv)
+        net_io = psutil.net_io_counters(pernic=True)
+        for iface, iinfo in net_io.iteritems():
+            net_io_map[iface]['errout'] = iinfo.errout
+            net_io_map[iface]['net_if_in_bytes_persec'].insert(0, iinfo.bytes_recv)
+            net_io_map[iface]['net_if_out_bytes_persec'].insert(0, iinfo.bytes_sent)
+            net_io_map[iface]['net_if_in_packets_persec'].insert(0, iinfo.packets_recv)
 
-        return (operator.sub(*net_if_in_bytes_persec_list) * 8,
-                operator.sub(*net_if_out_bytes_persec_list) * 8,
-                operator.sub(*net_if_in_packets_persec_list) * 8,
-                net_io.errout)
+        return (operator.sub(*net_io_map[name]['net_if_in_bytes_persec']) * 8,
+                operator.sub(*net_io_map[name]['net_if_out_bytes_persec']) * 8,
+                operator.sub(*net_io_map[name]['net_if_in_packets_persec']) * 8,
+                net_io_map[name]['errout'])
 
     def start_collects(self):
         metrics = []
@@ -116,7 +123,7 @@ class Collector(BaseCollector):
             if net_if.startswith('docker') or net_if.startswith('lo'):
                 continue
 
-            net_count = self.get_net_counts(sample_duration=1)
+            net_count = self.get_net_counts(net_if, sample_duration=1)
             data_func = partial(self.get_metricdata, net_if, net_count)
 
             net_data = {

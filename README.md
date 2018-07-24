@@ -1,5 +1,5 @@
 ### For Arch:
-#### xm2cloud_agent is a powerful and graceful engine component for xm2cloud devops framework.
+#### xm2cloud_agent is a powerful and graceful agent component for xm2cloud devops framework.
 
 
 ### For Devops:

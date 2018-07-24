@@ -33,13 +33,13 @@ class RabbitMQChannelSender(BaseChannelHelper, AMQPSender):
 
     def connect(self):
         conn_parameters = pika.ConnectionParameters(
+            heartbeat=15,
             retry_delay=5,
             ssl=self._ssl,
             host=self._host,
             port=self._port,
             channel_max=1000,
             socket_timeout=15,
-            heartbeat_interval=10,
             connection_attempts=5,
             virtual_host=self._vhost,
             credentials=pika.PlainCredentials(self._auth_user, self._auth_pass)
@@ -89,13 +89,13 @@ class RabbitMQChannelReceiver(BaseChannelHelper, AMQPReceiver):
 
     def connect(self):
         conn_parameters = pika.ConnectionParameters(
+            heartbeat=15,
             retry_delay=5,
             ssl=self._ssl,
             host=self._host,
             port=self._port,
             channel_max=1000,
             socket_timeout=15,
-            heartbeat_interval=10,
             connection_attempts=5,
             virtual_host=self._vhost,
             credentials=pika.PlainCredentials(self._auth_user, self._auth_pass)
@@ -107,6 +107,9 @@ class RabbitMQChannelReceiver(BaseChannelHelper, AMQPReceiver):
                                      stop_ioloop_on_close=True)
 
     def allow_receive(self, fcontent):
+        # reload user data, prevent user data update
+        self._userdata = self.userdata_dao.get_user_data()
+
         # get source from userdata event
         host_id = self._userdata.get_host_id()
         cluster_id = self._userdata.get_cluster_id()
