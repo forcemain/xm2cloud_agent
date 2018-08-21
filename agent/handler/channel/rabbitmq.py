@@ -122,17 +122,12 @@ class RabbitMQChannelReceiver(BaseChannelHelper, AMQPReceiver):
         target_hostgroup_id = event.get_target_hostgroup_id()
 
         # is it my task ?
-        if isinstance(target_host_id, list) and host_id in target_host_id:
-            return True
-        if isinstance(target_hostgroup_id, list) and isinstance(hostgroup_id, list) and (
-            set(target_hostgroup_id) & set(hostgroup_id)
-        ):
-            return True
-        if isinstance(target_cluster_id, list) and isinstance(cluster_id, list) and (
-            set(target_cluster_id) & set(cluster_id)
-        ):
-            return True
-
+        if isinstance(target_host_id, list) and target_host_id:
+            return host_id in target_host_id
+        elif isinstance(target_hostgroup_id, list) and target_hostgroup_id:
+            return isinstance(hostgroup_id, list) and (set(target_hostgroup_id) & set(hostgroup_id))
+        elif isinstance(target_cluster_id, list) and target_cluster_id:
+            return isinstance(cluster_id, list) and (set(target_cluster_id) & set(cluster_id))
         return False
 
     def on_message(self, unused_channel, basic_deliver, properties, body):

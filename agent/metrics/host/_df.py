@@ -13,23 +13,9 @@ from agent.metrics.basecollect import BaseCollector
 
 
 class Df(BaseMetric):
-    def __init__(self, df_bytes_total=None, df_bytes_used=None, df_bytes_free=None, df_bytes_used_percentage=None):
-        self.df_bytes_total = df_bytes_total
-        self.df_bytes_used = df_bytes_used
+    def __init__(self, df_bytes_free=None, df_bytes_used_percentage=None):
         self.df_bytes_free = df_bytes_free
         self.df_bytes_used_percentage = df_bytes_used_percentage
-
-    def get_df_bytes_total(self):
-        return self.df_bytes_total
-
-    def set_df_bytes_total(self, df_bytes_total):
-        self.df_bytes_total = df_bytes_total
-
-    def get_df_bytes_used(self):
-        return self.df_bytes_used
-
-    def set_df_bytes_used(self, df_bytes_used):
-        self.df_bytes_used = df_bytes_used
 
     def get_df_bytes_free(self):
         return self. df_bytes_free
@@ -45,10 +31,6 @@ class Df(BaseMetric):
 
     def to_dict(self):
         data = {}
-        if isinstance(self.get_df_bytes_total(), MetricData):
-            data['df_bytes_total'] = self.get_df_bytes_total().to_dict()
-        if isinstance(self.get_df_bytes_used(), MetricData):
-            data['df_bytes_total'] = self.get_df_bytes_used().to_dict()
         if isinstance(self.get_df_bytes_free(), MetricData):
             data['df_bytes_free'] = self.get_df_bytes_free().to_dict()
         if isinstance(self.get_df_bytes_used_percentage(), MetricData):
@@ -62,19 +44,8 @@ class Df(BaseMetric):
 
 class Collector(BaseCollector):
     def get_metricdata(self, disk, disk_usage, name):
-        ddev = os.path.basename(disk.device)
-        tags = {'device': ddev, 'mount': disk.mountpoint}
+        tags = {'mount': disk.mountpoint}
         for case in Switch(name):
-            if case('df_bytes_total'):
-                name = 'df.bytes.total'
-                value = disk_usage.total
-
-                return MetricData(name, tags, value)
-            if case('df_bytes_used'):
-                name = 'df.bytes.used'
-                value = disk_usage.used
-
-                return MetricData(name, tags, value)
             if case('df_bytes_free'):
                 name = 'df.bytes.free'
                 value = disk_usage.free
@@ -99,8 +70,6 @@ class Collector(BaseCollector):
             disk_usage = psutil.disk_usage(disk.mountpoint)
             data_func = partial(self.get_metricdata, disk, disk_usage)
             disk_data = {
-                'df_bytes_total': data_func('df_bytes_total'),
-                'df_bytes_used': data_func('df_bytes_used'),
                 'df_bytes_free': data_func('df_bytes_free'),
                 'df_bytes_used_percentage': data_func('df_bytes_used_percentage')
             }

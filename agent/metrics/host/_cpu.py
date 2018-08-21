@@ -12,46 +12,19 @@ from agent.metrics.basecollect import BaseCollector
 
 
 class Cpu(BaseMetric):
-    def __init__(self, cpu_idle=None, cpu_user=None, cpu_iowait=None, cpu_system=None):
-        self.cpu_idle = cpu_idle
-        self.cpu_user = cpu_user
-        self.cpu_iowait = cpu_iowait
-        self.cpu_system = cpu_system
+    def __init__(self, cpu_used_percentage=None):
+        self.cpu_used_percentage = cpu_used_percentage
 
-    def get_cpu_idle(self):
-        return self.cpu_idle
+    def get_cpu_used_percentage(self):
+        return self.cpu_used_percentage
 
-    def set_cpu_idle(self, cpu_idle):
-        self.cpu_idle = cpu_idle
-
-    def get_cpu_user(self):
-        return self.cpu_user
-
-    def set_cpu_user(self, cpu_user):
-        self.cpu_user = cpu_user
-
-    def get_cpu_iowait(self):
-        return self.cpu_iowait
-
-    def set_cpu_iowait(self, cpu_iowait):
-        self.cpu_iowait = cpu_iowait
-
-    def get_cpu_system(self):
-        return self.cpu_system
-
-    def set_cpu_system(self, cpu_system):
-        self.cpu_system = cpu_system
+    def set_cpu_used_percentage(self, cpu_used_percentage):
+        self.cpu_used_percentage = cpu_used_percentage
 
     def to_dict(self):
         data = {}
-        if isinstance(self.get_cpu_idle(), MetricData):
-            data['cpu_idle'] = self.get_cpu_idle().to_dict()
-        if isinstance(self.get_cpu_user(), MetricData):
-            data['cpu_user'] = self.get_cpu_user().to_dict()
-        if isinstance(self.get_cpu_iowait(), MetricData):
-            data['cpu_iowait'] = self.get_cpu_iowait().to_dict()
-        if isinstance(self.get_cpu_system(), MetricData):
-            data['cpu_system'] = self.get_cpu_system().to_dict()
+        if isinstance(self.get_cpu_used_percentage(), MetricData):
+            data['cpu_used_percentage'] = self.get_cpu_used_percentage().to_dict()
 
         return data
 
@@ -63,24 +36,9 @@ class Collector(BaseCollector):
     def get_metricdata(self, cpu_usage, name):
         tags = {}
         for case in Switch(name):
-            if case('cpu_idle'):
-                name = 'cpu.idle'
-                value = cpu_usage.get('idle')
-
-                return MetricData(name, tags, value)
-            if case('cpu_user'):
-                name = 'cpu.user'
-                value = cpu_usage.get('user')
-
-                return MetricData(name, tags, value)
-            if case('cpu_iowait'):
-                name = 'cpu.iowait'
-                value = cpu_usage.get('iowait')
-
-                return MetricData(name, tags, value)
-            if case('cpu_system'):
-                name = 'cpu.system'
-                value = cpu_usage.get('system')
+            if case('cpu_used_percentage'):
+                name = 'cpu.used.percentage'
+                value = 100 - cpu_usage.get('idle')
 
                 return MetricData(name, tags, value)
             if case():
@@ -93,10 +51,7 @@ class Collector(BaseCollector):
         data_func = partial(self.get_metricdata, cpu_usage)
 
         cpu_data = {
-            'cpu_idle': data_func('cpu_idle'),
-            'cpu_user': data_func('cpu_user'),
-            'cpu_iowait': data_func('cpu_iowait'),
-            'cpu_system': data_func('cpu_system')
+            'cpu_used_percentage': data_func('cpu_used_percentage'),
         }
         instance = Cpu(**cpu_data)
         metrics.append(instance)
